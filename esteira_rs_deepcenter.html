@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Esteira R&S — DeepCenter</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#080f24;--bg2:#0a1228;--bg3:#0d1830;
+  --bd:rgba(255,255,255,0.07);--tx:#c8d8f0;--tx2:#8fa3cc;--tx3:#4e6a9a;
+  --kv:#fff;--cg:rgba(255,255,255,0.05);--ct2:#4e6a9a;
+  --hbg:rgba(255,255,255,0.06);--rh:rgba(0,120,212,0.08);
+  --thb:rgba(255,255,255,0.08);--tdb:rgba(255,255,255,0.04);
+  --ibg:#0d1830;--ibd:rgba(255,255,255,0.08);
+  --inp:#0d1830;--inp-bd:rgba(255,255,255,0.15);
+  --tog:#1a2a50;
+}
+.light{
+  --bg:#f0f4fb;--bg2:#fff;--bg3:#fff;
+  --bd:rgba(0,0,0,0.08);--tx:#2c3e6b;--tx2:#4a5e8a;--tx3:#8a9cc0;
+  --kv:#1a2b52;--cg:rgba(0,0,0,0.05);--ct2:#8a9cc0;
+  --hbg:rgba(0,0,0,0.07);--rh:rgba(0,120,212,0.05);
+  --thb:rgba(0,0,0,0.08);--tdb:rgba(0,0,0,0.04);
+  --ibg:#f5f8ff;--ibd:rgba(0,0,0,0.09);
+  --inp:#f4f7ff;--inp-bd:rgba(0,0,0,0.15);
+  --tog:#dde6f8;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,'Segoe UI',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;font-size:14px}
+
+/* TOPBAR */
+.topbar{background:var(--bg2);border-bottom:1px solid var(--bd);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:999}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icon{width:30px;height:30px;background:linear-gradient(135deg,#0078D4,#00b4d8);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:12px;flex-shrink:0}
+.logo-name{font-size:13px;font-weight:600;color:var(--kv)}
+.logo-sub{font-size:10px;color:var(--tx3)}
+
+/* TOGGLE */
+.tog{background:var(--tog);border:1px solid var(--bd);border-radius:20px;padding:5px 12px;cursor:pointer;display:flex;align-items:center;gap:6px;font-size:11px;color:var(--tx2);font-family:inherit}
+.tog-track{width:32px;height:17px;background:var(--bd);border-radius:9px;position:relative;pointer-events:none;flex-shrink:0}
+.light .tog-track{background:#0078D4}
+.tog-knob{width:11px;height:11px;background:#fff;border-radius:50%;position:absolute;top:3px;left:3px;transition:transform .2s;pointer-events:none;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.light .tog-knob{transform:translateX(15px)}
+
+/* TABS */
+.tabs{background:var(--bg2);border-bottom:1px solid var(--bd);display:flex;overflow-x:auto;position:sticky;top:51px;z-index:998;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:0 14px;height:42px;border:none;background:transparent;color:var(--tx3);font-size:11px;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;font-family:inherit;min-width:60px;flex-shrink:0}
+.tab:hover{color:var(--tx2)}
+.tab.on{color:#0078D4;border-bottom-color:#0078D4}
+
+/* PAGES */
+.page{display:none;padding:14px;flex-direction:column;gap:12px}
+.page.on{display:flex}
+
+/* KPI GRID */
+.kgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:9px}
+.kcard{background:var(--bg3);border:1px solid var(--bd);border-radius:10px;padding:12px 14px}
+.klabel{font-size:9px;text-transform:uppercase;letter-spacing:.5px;color:var(--tx3);margin-bottom:5px}
+.kval{font-size:20px;font-weight:700;color:var(--kv)}
+.kdesc{font-size:9px;margin-top:3px;color:var(--tx3)}
+.c-g{color:#22c55e}.c-y{color:#f59e0b}.c-r{color:#ef4444}.c-b{color:#3b82f6}
+
+/* CARDS */
+.card{background:var(--bg3);border:1px solid var(--bd);border-radius:10px;padding:15px}
+.ctitle{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;color:var(--tx3);margin-bottom:12px}
+
+/* GRIDS */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:11px}
+
+/* HBARS */
+.hbars{display:flex;flex-direction:column;gap:6px}
+.hbar-row{display:flex;align-items:center;gap:8px}
+.hbar-lbl{font-size:10px;color:var(--tx2);min-width:130px;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hbar-track{flex:1;background:var(--hbg);border-radius:3px;height:10px;overflow:hidden}
+.hbar-fill{height:100%;border-radius:3px}
+.hbar-val{font-size:10px;color:var(--tx3);min-width:22px;text-align:right;font-weight:600}
+
+/* ALERTS */
+.alert{padding:9px 12px;border-radius:7px;font-size:10px;margin-top:8px;border-left:3px solid;line-height:1.5}
+.alert-r{background:rgba(239,68,68,.08);border-color:#ef4444;color:#ef4444}
+.alert-y{background:rgba(245,158,11,.08);border-color:#f59e0b;color:#f59e0b}
+.alert-g{background:rgba(34,197,94,.08);border-color:#22c55e;color:#22c55e}
+.alert-b{background:rgba(59,130,246,.08);border-color:#3b82f6;color:#3b82f6}
+.light .alert-r{color:#b91c1c}.light .alert-y{color:#92400e}
+.light .alert-g{color:#14532d}.light .alert-b{color:#1e3a8a}
+
+/* FUNIL */
+.funil{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 0}
+.fstep{border-radius:6px;display:flex;align-items:center;justify-content:space-between;padding:7px 14px;font-size:11px;font-weight:500;color:var(--tx)}
+.farrow{border-left:8px solid transparent;border-right:8px solid transparent;border-top:7px solid rgba(128,128,128,.2)}
+
+/* INSIGHTS */
+.igrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:8px;margin-top:8px}
+.ins{background:var(--ibg);border:1px solid var(--ibd);border-radius:8px;padding:10px 12px}
+.ins-t{font-size:10px;font-weight:600;margin-bottom:3px}
+.ins-d{font-size:9px;color:var(--tx3);line-height:1.5}
+
+/* METRIC */
+.mpill{border-radius:8px;padding:9px 12px;margin-bottom:6px;border-left:3px solid}
+.mp-t{font-size:9px;color:var(--tx3);margin-bottom:2px}
+.mp-v{font-size:19px;font-weight:700;color:var(--kv)}
+
+/* LEGEND */
+.leg{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
+.leg-i{display:flex;align-items:center;gap:4px;font-size:9px;color:var(--tx3)}
+.leg-sq{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+
+/* BADGES */
+.badge{display:inline-block;padding:2px 7px;border-radius:20px;font-size:9px;font-weight:500}
+.bo{background:rgba(59,130,246,.15);color:#3b82f6}
+.bl{background:rgba(34,197,94,.15);color:#22c55e}
+.by{background:rgba(245,158,11,.15);color:#f59e0b}
+.br{background:rgba(239,68,68,.15);color:#ef4444}
+.bp{background:rgba(168,85,247,.15);color:#a855f7}
+
+/* TABLE */
+.tbl-wrap{overflow:auto;max-height:480px}
+table{width:100%;border-collapse:collapse;font-size:10px;min-width:700px}
+th{background:var(--bg3);color:var(--tx3);font-size:9px;text-transform:uppercase;letter-spacing:.4px;padding:7px 8px;text-align:left;border-bottom:1px solid var(--thb);position:sticky;top:0;z-index:2}
+td{color:var(--tx2);padding:6px 8px;border-bottom:1px solid var(--tdb)}
+tr:hover td{background:var(--rh)}
+
+/* FILTERS */
+.filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.filters input,.filters select{background:var(--inp);border:1px solid var(--inp-bd);border-radius:7px;padding:8px 10px;color:var(--tx);font-size:11px;font-family:inherit;outline:none}
+.filters input{flex:1;min-width:160px}
+.filters select{min-width:120px}
+#fcnt{font-size:10px;color:var(--tx3);white-space:nowrap}
+
+/* RESPONSIVE */
+@media(max-width:600px){
+  .g2,.g3{grid-template-columns:1fr}
+  .kgrid{grid-template-columns:repeat(2,1fr)}
+  .hbar-lbl{min-width:90px;max-width:100px}
+  .tog span{display:none}
+  .logo-sub{display:none}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">
+    <div class="logo-icon">RS</div>
+    <div>
+      <div class="logo-name">Esteira R&amp;S — DeepCenter</div>
+      <div class="logo-sub">Pessoas e Cultura · 102 candidatos · 15/04/2026</div>
+    </div>
+  </div>
+  <button class="tog" onclick="toggleTheme()">
+    <div class="tog-track"><div class="tog-knob"></div></div>
+    <span id="tlbl">Tema escuro</span>
+  </button>
+</div>
+
+<div class="tabs">
+  <button class="tab on"  id="tb1" onclick="showPage('pg1','tb1')">Geral</button>
+  <button class="tab"     id="tb2" onclick="showPage('pg2','tb2')">Funil</button>
+  <button class="tab"     id="tb3" onclick="showPage('pg3','tb3')">Scores &amp; Fit</button>
+  <button class="tab"     id="tb4" onclick="showPage('pg4','tb4')">Declínios</button>
+  <button class="tab"     id="tb5" onclick="showPage('pg5','tb5')">Salários</button>
+  <button class="tab"     id="tb6" onclick="showPage('pg6','tb6')">Candidatos</button>
+</div>
+
+<!-- ====== P1 GERAL ====== -->
+<div id="pg1" class="page on">
+  <div class="kgrid">
+    <div class="kcard"><div class="klabel">Total candidatos</div><div class="kval">102</div><div class="kdesc c-b">em processo</div></div>
+    <div class="kcard"><div class="klabel">Em andamento</div><div class="kval c-g">19</div><div class="kdesc c-g">18,6% do total</div></div>
+    <div class="kcard"><div class="klabel">Finalizados</div><div class="kval" style="color:var(--tx2)">68</div><div class="kdesc">66,7%</div></div>
+    <div class="kcard"><div class="klabel">Stand By / Hub</div><div class="kval c-y">12</div><div class="kdesc c-y">banco talentos</div></div>
+    <div class="kcard"><div class="klabel">Contratados</div><div class="kval c-g">1</div><div class="kdesc c-g">Felipe Solera</div></div>
+    <div class="kcard"><div class="klabel">Vagas ativas</div><div class="kval c-b">8</div><div class="kdesc c-b">múltiplas áreas</div></div>
+  </div>
+  <div class="g3">
+    <div class="card">
+      <div class="ctitle">Candidatos por vaga</div>
+      <div class="hbars">
+        <div class="hbar-row"><span class="hbar-lbl">Engenheiro de Dados</span><div class="hbar-track"><div class="hbar-fill" style="width:100%;background:#3b82f6"></div></div><span class="hbar-val">37</span></div>
+        <div class="hbar-row"><span class="hbar-lbl">An. Planejamento</span><div class="hbar-track"><div class="hbar-fill" style="width:46%;background:#22c55e"></div></div><span class="hbar-val">17</span></div>
+        <div class="hbar-row"><span class="hbar-lbl">Eng. Dados SAS</span><div class="hbar-track"><div class="hbar-fill" style="width:43%;background:#60a5fa"></div></div><span class="hbar-val">16</span></div>
+        <div class="hbar-row"><span class="hbar-lbl">Dev. Full Stack</span><div class="hbar-track"><div class="hbar-fill" style="width:43%;background:#22c55e"></div></div><span class="hbar-val">16</span></div>
+        <div class="hbar-row"><span class="hbar-lbl">Engenheiro de IA</span><div class="hbar-track"><div class="hbar-fill" style="width:24%;background:#f59e0b"></div></div><span class="hbar-val">9</span></div>
+        <div class="hbar-row"><span class="hbar-lbl">Eng. Dados Backend</span><div class="hbar-track"><div class="hbar-fill" style="width:16%;background:#f59e0b"></div></div><span class="hbar-val">6</span></div>
+        <div class="hbar-row"><span class="hbar-lbl">Closer</span><div class="hbar-track"><div class="hbar-fill" style="width:3%;background:#ef4444"></div></div><span class="hbar-val">1</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ctitle">Fonte dos candidatos</div>
+      <div style="position:relative;height:150px"><canvas id="cFonte"></canvas></div>
+      <div class="leg"><span class="leg-i"><span class="leg-sq" style="background:#3b82f6"></span>LinkedIn 94%</span><span class="leg-i"><span class="leg-sq" style="background:#22c55e"></span>Catho 3%</span><span class="leg-i"><span class="leg-sq" style="background:#f59e0b"></span>Indicação 3%</span></div>
+    </div>
+    <div class="card">
+      <div class="ctitle">Status geral</div>
+      <div style="position:relative;height:150px"><canvas id="cStatus"></canvas></div>
+      <div class="leg"><span class="leg-i"><span class="leg-sq" style="background:#4b6a9a"></span>Finalizado</span><span class="leg-i"><span class="leg-sq" style="background:#22c55e"></span>Andamento</span><span class="leg-i"><span class="leg-sq" style="background:#f59e0b"></span>Stand/Hub</span></div>
+    </div>
+  </div>
+  <div class="g2">
+    <div class="card">
+      <div class="ctitle">Distribuição por área</div>
+      <div style="position:relative;height:165px"><canvas id="cArea"></canvas></div>
+      <div class="leg"><span class="leg-i"><span class="leg-sq" style="background:#3b82f6"></span>Operações 54%</span><span class="leg-i"><span class="leg-sq" style="background:#22c55e"></span>Legal AI 28%</span><span class="leg-i"><span class="leg-sq" style="background:#f59e0b"></span>Body Shop 16%</span></div>
+    </div>
+    <div class="card">
+      <div class="ctitle">Status final dos candidatos</div>
+      <div style="position:relative;height:165px"><canvas id="cStatusV"></canvas></div>
+      <div class="alert alert-r">Taxa de declínio: <strong>54,9%</strong> — principal gargalo do processo</div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== P2 FUNIL ====== -->
+<div id="pg2" class="page">
+  <div class="g2">
+    <div class="card">
+      <div class="ctitle">Funil do processo seletivo</div>
+      <div class="funil">
+        <div class="fstep" style="width:100%;background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.3)"><span>Triagem</span><span>59</span></div>
+        <div class="farrow"></div>
+        <div class="fstep" style="width:82%;background:rgba(96,165,250,.12);border:1px solid rgba(96,165,250,.25)"><span>Entrevista RH</span><span>30</span></div>
+        <div class="farrow"></div>
+        <div class="fstep" style="width:60%;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.22)"><span>Entrevista Técnica</span><span>4</span></div>
+        <div class="farrow"></div>
+        <div class="fstep" style="width:42%;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.22)"><span>Teste / Case</span><span>3</span></div>
+        <div class="farrow"></div>
+        <div class="fstep" style="width:28%;background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.22)"><span>Finalista / DIR</span><span>5</span></div>
+        <div class="farrow"></div>
+        <div class="fstep" style="width:14%;background:rgba(245,158,11,.14);border:1px solid rgba(245,158,11,.3)"><span>Proposta</span><span>1</span></div>
+        <div class="farrow"></div>
+        <div class="fstep" style="width:8%;background:rgba(34,197,94,.18);border:1px solid rgba(34,197,94,.4)"><span>Contratado</span><span>1</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ctitle">Volume por estágio</div>
+      <div style="position:relative;height:260px"><canvas id="cFunil"></canvas></div>
+    </div>
+  </div>
+  <div class="g3">
+    <div class="card">
+      <div class="ctitle">Taxas de conversão</div>
+      <div class="mpill alert-b" style="border-color:#3b82f6;margin-top:4px"><div class="mp-t">Triagem → Entrevista RH</div><div class="mp-v">50,8%</div></div>
+      <div class="mpill alert-g" style="border-color:#22c55e"><div class="mp-t">RH → Etapas avançadas</div><div class="mp-v">26,7%</div></div>
+      <div class="mpill" style="background:rgba(168,85,247,.07);border-left:3px solid #a855f7;border-radius:8px;padding:9px 12px;margin-bottom:6px"><div class="mp-t">Finalista → Contratado</div><div class="mp-v">20,0%</div></div>
+      <div class="mpill alert-r" style="border-color:#ef4444"><div class="mp-t">Taxa geral de declínio</div><div class="mp-v">54,9%</div></div>
+    </div>
+    <div class="card">
+      <div class="ctitle">Estágio × Área</div>
+      <div style="position:relative;height:215px"><canvas id="cAreaEst"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="ctitle">Composição status geral</div>
+      <div style="position:relative;height:215px"><canvas id="cStatusPie"></canvas></div>
+      <div class="leg"><span class="leg-i"><span class="leg-sq" style="background:#22c55e"></span>Andamento</span><span class="leg-i"><span class="leg-sq" style="background:#4b6a9a"></span>Finalizado</span><span class="leg-i"><span class="leg-sq" style="background:#f59e0b"></span>Stand By</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== P3 SCORES ====== -->
+<div id="pg3" class="page">
+  <div class="kgrid" style="grid-template-columns:repeat(auto-fit,minmax(130px,1fr))">
+    <div class="kcard"><div class="klabel">Score técnico médio</div><div class="kval c-b">3,88</div><div class="kdesc c-b">41 avaliados</div></div>
+    <div class="kcard"><div class="klabel">Score comp. médio</div><div class="kval c-g">4,29</div><div class="kdesc c-g">41 avaliados</div></div>
+    <div class="kcard"><div class="klabel">Fit Alto</div><div class="kval c-g">19</div><div class="kdesc c-g">40,4% avaliados</div></div>
+    <div class="kcard"><div class="klabel">Fit Médio</div><div class="kval c-y">17</div><div class="kdesc c-y">36,2% avaliados</div></div>
+    <div class="kcard"><div class="klabel">Fit Baixo</div><div class="kval c-r">11</div><div class="kdesc c-r">23,4% avaliados</div></div>
+  </div>
+  <div class="g3">
+    <div class="card"><div class="ctitle">Score Técnico</div><div style="position:relative;height:170px"><canvas id="cTec"></canvas></div><div class="leg"><span class="leg-i"><span class="leg-sq" style="background:#f59e0b"></span>3—37%</span><span class="leg-i"><span class="leg-sq" style="background:#3b82f6"></span>4—39%</span><span class="leg-i"><span class="leg-sq" style="background:#22c55e"></span>5—24%</span></div></div>
+    <div class="card"><div class="ctitle">Score Comportamental</div><div style="position:relative;height:170px"><canvas id="cComp"></canvas></div><div class="leg"><span class="leg-i"><span class="leg-sq" style="background:#f59e0b"></span>3—15%</span><span class="leg-i"><span class="leg-sq" style="background:#3b82f6"></span>4—41%</span><span class="leg-i"><span class="leg-sq" style="background:#22c55e"></span>5—44%</span></div></div>
+    <div class="card"><div class="ctitle">Fit Cultura Deep</div><div style="position:relative;height:170px"><canvas id="cFit"></canvas></div><div class="leg"><span class="leg-i"><span class="leg-sq" style="background:#22c55e"></span>Alto 40%</span><span class="leg-i"><span class="leg-sq" style="background:#f59e0b"></span>Médio 36%</span><span class="leg-i"><span class="leg-sq" style="background:#ef4444"></span>Baixo 23%</span></div></div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="ctitle">Dispersão: Score Técnico × Comportamental</div><div style="position:relative;height:200px"><canvas id="cScatter"></canvas></div><div class="alert alert-g">Candidatos 5×5: <strong>4 perfis</strong> — máxima aderência técnica e comportamental</div></div>
+    <div class="card"><div class="ctitle">Fit Cultural × Score Técnico</div><div style="position:relative;height:200px"><canvas id="cFitTec"></canvas></div><div class="alert alert-y">Score 4 com Fit Alto: <strong>melhor pool</strong> de aproveitamento</div></div>
+  </div>
+</div>
+
+<!-- ====== P4 DECLÍNIOS ====== -->
+<div id="pg4" class="page">
+  <div class="kgrid">
+    <div class="kcard"><div class="klabel">Total declínios</div><div class="kval c-r">56</div><div class="kdesc c-r">54,9% candidatos</div></div>
+    <div class="kcard"><div class="klabel">Por remuneração</div><div class="kval c-y">20</div><div class="kdesc c-y">35,7% declínios</div></div>
+    <div class="kcard"><div class="klabel">Total reprovados</div><div class="kval c-y">18</div><div class="kdesc c-y">17,6% do total</div></div>
+    <div class="kcard"><div class="klabel">Téc. insuficiente</div><div class="kval">11</div><div class="kdesc">61% reprovações</div></div>
+  </div>
+  <div class="g2">
+    <div class="card">
+      <div class="ctitle">Motivos de declínio (candidato)</div>
+      <div style="position:relative;height:215px"><canvas id="cDecl"></canvas></div>
+      <div class="alert alert-r"><strong>Remuneração + Modelo + PJ = 33</strong> — 59% das perdas são estruturais</div>
+    </div>
+    <div class="card">
+      <div class="ctitle">Motivos de reprovação (empresa)</div>
+      <div style="position:relative;height:215px"><canvas id="cReprov"></canvas></div>
+      <div class="alert alert-y"><strong>Overqualification: 6 perfis</strong> — recomendados para Talent Hub</div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ctitle">Análise estratégica das perdas</div>
+    <div class="igrid">
+      <div class="ins" style="border-color:rgba(239,68,68,.2)"><div class="ins-t" style="color:#ef4444">Remuneração (20)</div><div class="ins-d">Budget abaixo do mercado. Revisar faixas salariais ou ajustar o perfil buscado.</div></div>
+      <div class="ins" style="border-color:rgba(245,158,11,.2)"><div class="ins-t" style="color:#f59e0b">Modelo/PJ/Híbrido (13)</div><div class="ins-d">Candidatos recusam PJ ou presencial. Avaliar flexibilidade ou comunicar melhor.</div></div>
+      <div class="ins" style="border-color:rgba(59,130,246,.2)"><div class="ins-t" style="color:#3b82f6">Sem resposta/interesse (11)</div><div class="ins-d">Não engajaram. Rever abordagem e timing das triagens.</div></div>
+      <div class="ins" style="border-color:rgba(34,197,94,.2)"><div class="ins-t" style="color:#22c55e">Overqualification (6)</div><div class="ins-d">Perfis acima do esperado — 6 já no Talent Hub para futuras vagas.</div></div>
+      <div class="ins" style="border-color:rgba(239,68,68,.2)"><div class="ins-t" style="color:#ef4444">Técnico insuficiente (11)</div><div class="ins-d">Candidatos abaixo da senioridade chegam ao RH. Reforçar triagem.</div></div>
+      <div class="ins" style="border-color:rgba(168,85,247,.2)"><div class="ins-t" style="color:#a855f7">Aproveitamento: 1,0%</div><div class="ins-d">1 contratação em 102. Qualificar leads antes do processo formal.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== P5 SALÁRIOS ====== -->
+<div id="pg5" class="page">
+  <div class="kgrid">
+    <div class="kcard"><div class="klabel">Média pretendida</div><div class="kval c-y">R$12.271</div><div class="kdesc c-y">14 candidatos</div></div>
+    <div class="kcard"><div class="klabel">Média ofertada</div><div class="kval c-b">R$9.265</div><div class="kdesc c-b">17 candidatos</div></div>
+    <div class="kcard"><div class="klabel">GAP médio</div><div class="kval c-r">R$3.006</div><div class="kdesc c-r">candidato +32%</div></div>
+    <div class="kcard"><div class="klabel">Maior pretensão</div><div class="kval">R$25.000</div><div class="kdesc">caso extremo</div></div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="ctitle">Pretendido vs. Ofertado</div><div style="position:relative;height:220px"><canvas id="cSalComp"></canvas></div><div class="leg"><span class="leg-i"><span class="leg-sq" style="background:#f59e0b"></span>Pretendido</span><span class="leg-i"><span class="leg-sq" style="background:#3b82f6"></span>Ofertado</span></div></div>
+    <div class="card"><div class="ctitle">Faixas salariais pretendidas</div><div style="position:relative;height:220px"><canvas id="cSalDist"></canvas></div><div class="leg"><span class="leg-i"><span class="leg-sq" style="background:#22c55e"></span>Até R$8k</span><span class="leg-i"><span class="leg-sq" style="background:#3b82f6"></span>R$8-12k</span><span class="leg-i"><span class="leg-sq" style="background:#f59e0b"></span>R$12-18k</span><span class="leg-i"><span class="leg-sq" style="background:#ef4444"></span>+R$18k</span></div></div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="ctitle">Candidatos por área</div><div style="position:relative;height:175px"><canvas id="cAreaBar"></canvas></div></div>
+    <div class="card"><div class="ctitle">Status final por contagem</div><div style="position:relative;height:175px"><canvas id="cVagaSt"></canvas></div></div>
+  </div>
+</div>
+
+<!-- ====== P6 CANDIDATOS ====== -->
+<div id="pg6" class="page">
+  <div class="filters">
+    <input type="search" id="fsrch" placeholder="Buscar nome, vaga, status..." oninput="filtrar()">
+    <select id="farea" onchange="filtrar()">
+      <option value="">Todas as áreas</option>
+      <option>Operações</option><option>Legal AI</option><option>Body Shop</option><option>Comercial</option><option>TI</option>
+    </select>
+    <select id="fstat" onchange="filtrar()">
+      <option value="">Todos os status</option>
+      <option>Andamento</option><option>Finalizado</option><option>Stand By</option><option>Talent Hub</option><option>Congelado</option>
+    </select>
+    <span id="fcnt">102 registros</span>
+  </div>
+  <div class="card" style="padding:0;overflow:hidden">
+    <div class="tbl-wrap">
+      <table><thead><tr>
+        <th>Candidato</th><th>Vaga</th><th>Área</th><th>Fonte</th>
+        <th>Estágio</th><th>Status</th><th>Geral</th><th>Téc.</th><th>Comp.</th><th>Fit</th>
+      </tr></thead><tbody id="tbody"></tbody></table>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── THEME ──
+function toggleTheme(){
+  document.body.classList.toggle('light');
+  const isLight=document.body.classList.contains('light');
+  document.getElementById('tlbl').textContent=isLight?'Tema claro':'Tema escuro';
+  localStorage.setItem('theme',isLight?'light':'dark');
+  rebuildCharts();
+}
+if(localStorage.getItem('theme')==='light'){
+  document.body.classList.add('light');
+  document.getElementById('tlbl').textContent='Tema claro';
+}
+
+// ── TABS ──
+function showPage(pid,tid){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  document.getElementById(pid).classList.add('on');
+  document.getElementById(tid).classList.add('on');
+  document.getElementById(tid).scrollIntoView({inline:'nearest',block:'nearest'});
+}
+
+// ── DATA ──
+const CANDS=[
+  {n:'Vitor Brandão',v:'Eng. Dados',a:'Operações',f:'LinkedIn',e:'Finalista/DIR',sv:'Declínio',sg:'Finalizado',t:'5',c:'5',fit:'Alto'},
+  {n:'Marcos Nascimento',v:'Eng. Dados',a:'Operações',f:'LinkedIn',e:'Entrevista RH',sv:'Reprovado',sg:'Finalizado',t:'3',c:'4',fit:'Médio'},
+  {n:'Lucas Damasceno',v:'Eng. Dados',a:'Operações',f:'LinkedIn',e:'Entrevista RH',sv:'Declínio',sg:'Finalizado',t:'4',c:'5',fit:'Alto'},
+  {n:'Kelvin Willian',v:'Eng. Dados',a:'Operações',f:'LinkedIn',e:'Entrevista RH',sv:'Reprovado',sg:'Talent Hub',t:'5',c:'4',fit:'Alto'},
+  {n:'Marcos Lisboa',v:'Eng. Dados',a:'Operações',f:'LinkedIn',e:'Entrevista RH',sv:'Reprovado',sg:'Stand By',t:'3',c:'4',fit:'Baixo'},
+  {n:'Gianlucca A.',v:'Eng. Dados',a:'Operações',f:'LinkedIn',e:'Entrevista RH',sv:'Reprovado',sg:'Stand By',t:'3',c:'4',fit:'Médio'},
+  {n:'Dennis Sanches',v:'Eng. Dados',a:'Operações',f:'Indicação',e:'Triagem',sv:'Reprovado',sg:'Finalizado',t:'3',c:'-',fit:'Baixo'},
+  {n:'Nicolas Matos',v:'Eng. Dados',a:'Operações',f:'LinkedIn',e:'Triagem',sv:'Reprovado',sg:'Finalizado',t:'3',c:'4',fit:'Baixo'},
+  {n:'Maysa Kethelyn',v:'Closer',a:'Comercial',f:'LinkedIn',e:'Entrevista RH',sv:'Próxima etapa',sg:'Congelado',t:'3',c:'3',fit:'Alto'},
+  {n:'Guilherme Andrade',v:'Eng. Dados',a:'Operações',f:'LinkedIn',e:'Entrevista RH',sv:'Declínio',sg:'Stand By',t:'4',c:'4',fit:'Médio'},
+  {n:'Felipe Solera',v:'Eng. Dados',a:'Operações',f:'LinkedIn',e:'Proposta',sv:'Contratado',sg:'Finalizado',t:'4',c:'5',fit:'Alto'},
+  {n:'Felipe Santos',v:'Eng. Dados',a:'Operações',f:'LinkedIn',e:'Entrevista RH',sv:'Declínio',sg:'Finalizado',t:'3',c:'4',fit:'Baixo'},
+  {n:'Marcos Vinicius',v:'Eng. Dados',a:'Operações',f:'LinkedIn',e:'Entrevista RH',sv:'Declínio',sg:'Finalizado',t:'4',c:'5',fit:'Médio'},
+  {n:'Guilherme Mafra',v:'Eng. Dados',a:'Operações',f:'Catho',e:'Entrevista RH',sv:'Reprovado',sg:'Talent Hub',t:'4',c:'5',fit:'Alto'},
+  {n:'Hugo Saldanha',v:'Eng. Dados',a:'Operações',f:'LinkedIn',e:'Triagem',sv:'Reprovado',sg:'Stand By',t:'-',c:'-',fit:'Médio'},
+  {n:'Higor Lins',v:'Eng. Dados',a:'Operações',f:'Catho',e:'Triagem',sv:'Declínio',sg:'Talent Hub',t:'-',c:'-',fit:'Médio'},
+  {n:'Vinicius Machado',v:'Eng. Dados',a:'Operações',f:'LinkedIn',e:'Entrevista RH',sv:'Declínio',sg:'Talent Hub',t:'4',c:'4',fit:'Médio'},
+  {n:'Wesley Lima',v:'An. Planejamento',a:'Operações',f:'LinkedIn',e:'Entrevista RH',sv:'Próxima etapa',sg:'Andamento',t:'4',c:'5',fit:'Alto'},
+  {n:'Vinicius Gonçalves',v:'An. Planejamento',a:'Operações',f:'LinkedIn',e:'Entrevista RH',sv:'Reprovado',sg:'Finalizado',t:'3',c:'3',fit:'Baixo'},
+  {n:'Eduardo Bondezan',v:'An. Planejamento',a:'Operações',f:'LinkedIn',e:'Entrevista RH',sv:'Reprovado',sg:'Finalizado',t:'3',c:'3',fit:'Baixo'},
+  {n:'Jane Santos',v:'An. Planejamento',a:'Operações',f:'LinkedIn',e:'Entrevista RH',sv:'Declínio',sg:'Talent Hub',t:'4',c:'5',fit:'Alto'},
+  {n:'Michel Carvalho',v:'Dev. Full Stack',a:'Operações',f:'LinkedIn',e:'Triagem',sv:'Próxima etapa',sg:'Andamento',t:'4',c:'4',fit:'Médio'},
+  {n:'Thales Cirino',v:'Dev. Full Stack',a:'Operações',f:'LinkedIn',e:'Ent. Técnica',sv:'Próxima etapa',sg:'Andamento',t:'4',c:'5',fit:'Alto'},
+  {n:'Celso Ricardo',v:'Dev. Full Stack',a:'Operações',f:'Catho',e:'Entrevista RH',sv:'Reprovado',sg:'Finalizado',t:'3',c:'5',fit:'Baixo'},
+  {n:'William Silva',v:'Dev. Full Stack',a:'Operações',f:'LinkedIn',e:'Entrevista RH',sv:'Reprovado',sg:'Finalizado',t:'3',c:'4',fit:'Baixo'},
+  {n:'Danilo Moreira Salve',v:'Eng. IA',a:'Legal AI',f:'LinkedIn',e:'Finalista/DIR',sv:'Próxima etapa',sg:'Andamento',t:'-',c:'-',fit:'Alto'},
+  {n:'Ruan dos Santos',v:'Eng. IA',a:'Legal AI',f:'LinkedIn',e:'Finalista/DIR',sv:'Próxima etapa',sg:'Andamento',t:'-',c:'-',fit:'Médio'},
+  {n:'João Ricardo Pintaudi',v:'Eng. IA',a:'Legal AI',f:'LinkedIn',e:'Entrevista RH',sv:'Declínio',sg:'Finalizado',t:'5',c:'5',fit:'Alto'},
+  {n:'Klaus Bleinat',v:'Eng. IA',a:'Legal AI',f:'Indicação',e:'Entrevista RH',sv:'Reprovado',sg:'Finalizado',t:'3',c:'3',fit:'Baixo'},
+  {n:'Allan Medeiros',v:'Eng. IA',a:'Legal AI',f:'LinkedIn',e:'Finalista/DIR',sv:'Próxima etapa',sg:'Andamento',t:'-',c:'-',fit:'-'},
+  {n:'Pedro Tito',v:'Eng. Dados',a:'Operações',f:'LinkedIn',e:'Entrevista RH',sv:'Reprovado',sg:'Talent Hub',t:'5',c:'5',fit:'Alto'},
+  {n:'Milton Moura',v:'Eng. Dados',a:'Operações',f:'LinkedIn',e:'Entrevista RH',sv:'-',sg:'Finalizado',t:'4',c:'4',fit:'Alto'},
+  {n:'Gustavo Galvão',v:'Eng. Dados',a:'Operações',f:'LinkedIn',e:'Entrevista RH',sv:'Stand by',sg:'Finalizado',t:'5',c:'4',fit:'Médio'},
+  {n:'Gabriel Frigo',v:'Eng. Dados',a:'Operações',f:'LinkedIn',e:'Entrevista RH',sv:'Stand by',sg:'Finalizado',t:'5',c:'5',fit:'Alto'},
+  {n:'Christian Negrão',v:'Eng. Dados',a:'Operações',f:'LinkedIn',e:'Entrevista RH',sv:'Reprovado',sg:'Finalizado',t:'5',c:'5',fit:'Alto'},
+  {n:'Pedro Stoppa',v:'Eng. Dados',a:'Operações',f:'LinkedIn',e:'Entrevista RH',sv:'Reprovado',sg:'Finalizado',t:'4',c:'3',fit:'Baixo'},
+  {n:'Jessé Santana',v:'Dev. Full Stack',a:'Operações',f:'LinkedIn',e:'Teste/Case',sv:'Declínio',sg:'Finalizado',t:'5',c:'5',fit:'Alto'},
+  {n:'Paulo Chi',v:'Dev. Full Stack',a:'Operações',f:'LinkedIn',e:'Teste/Case',sv:'Próxima etapa',sg:'Andamento',t:'4',c:'5',fit:'Médio'},
+  {n:'Luiz Amaro',v:'Dev. Full Stack',a:'Legal AI',f:'LinkedIn',e:'Ent. Técnica',sv:'Próxima etapa',sg:'Andamento',t:'4',c:'4',fit:'Alto'},
+  {n:'Jorge Luiz',v:'Dev. Full Stack',a:'Legal AI',f:'LinkedIn',e:'Teste/Case',sv:'Próxima etapa',sg:'Andamento',t:'5',c:'4',fit:'Alto'},
+  {n:'Patrick Almeida',v:'Dev. Full Stack',a:'Legal AI',f:'LinkedIn',e:'Ent. Técnica',sv:'Próxima etapa',sg:'Andamento',t:'4',c:'5',fit:'Médio'},
+  {n:'Cristiano Florentino',v:'Eng. Dados SAS',a:'Body Shop',f:'LinkedIn',e:'Finalista/DIR',sv:'Próxima etapa',sg:'Andamento',t:'5',c:'5',fit:'Alto'},
+  {n:'Ricardo Ozawa',v:'Eng. Dados SAS',a:'Body Shop',f:'LinkedIn',e:'Entrevista RH',sv:'Reprovado',sg:'Finalizado',t:'3',c:'3',fit:'Baixo'},
+  {n:'Arnaldo Leandro',v:'Eng. Dados SAS',a:'Body Shop',f:'LinkedIn',e:'Entrevista RH',sv:'Declínio',sg:'Finalizado',t:'3',c:'4',fit:'Médio'},
+  {n:'Danielly Liz',v:'An. Planejamento',a:'Operações',f:'LinkedIn',e:'Entrevista RH',sv:'Reprovado',sg:'Stand By',t:'3',c:'5',fit:'Médio'},
+  {n:'Gustavo Lima',v:'Eng. Dados Backend',a:'Legal AI',f:'LinkedIn',e:'Entrevista RH',sv:'Declínio',sg:'Finalizado',t:'4',c:'4',fit:'Médio'},
+  {n:'David Paiva',v:'An. Planejamento',a:'Legal AI',f:'LinkedIn',e:'Triagem',sv:'Próxima etapa',sg:'Andamento',t:'-',c:'-',fit:'-'},
+  {n:'Eduardo Esteves',v:'Dev. Full Stack',a:'Legal AI',f:'LinkedIn',e:'Triagem',sv:'Próxima etapa',sg:'Andamento',t:'-',c:'-',fit:'-'},
+  {n:'Lucas Alexandre',v:'Eng. Dados Backend',a:'Legal AI',f:'LinkedIn',e:'Triagem',sv:'Próxima etapa',sg:'Andamento',t:'-',c:'-',fit:'-'},
+  {n:'Juliana Menezes',v:'Eng. Dados Backend',a:'Legal AI',f:'LinkedIn',e:'Triagem',sv:'Próxima etapa',sg:'Andamento',t:'-',c:'-',fit:'-'},
+  {n:'Daniel Mendes',v:'Eng. IA',a:'Legal AI',f:'LinkedIn',e:'Triagem',sv:'-',sg:'Andamento',t:'-',c:'-',fit:'-'},
+  {n:'João Pedro Tonello',v:'Eng. IA',a:'Legal AI',f:'LinkedIn',e:'Triagem',sv:'-',sg:'Andamento',t:'-',c:'-',fit:'-'},
+];
+
+function bA(a){if(!a||a==='-')return`<span style="color:var(--tx3)">—</span>`;if(a==='Operações')return`<span class="badge bo">${a}</span>`;if(a==='Legal AI')return`<span class="badge bl">${a}</span>`;if(a==='Body Shop')return`<span class="badge by">${a}</span>`;return`<span class="badge bp">${a}</span>`;}
+function bS(s){if(!s||s==='-')return`<span style="color:var(--tx3)">—</span>`;if(s==='Declínio')return`<span class="badge br">${s}</span>`;if(s==='Reprovado')return`<span class="badge by">${s}</span>`;if(s==='Contratado')return`<span class="badge bl">${s}</span>`;if(s==='Próxima etapa')return`<span class="badge bo">${s}</span>`;return`<span style="font-size:9px;color:var(--tx2)">${s}</span>`;}
+function bSc(v){if(!v||v==='-')return`<span style="color:var(--tx3)">—</span>`;const n=parseInt(v),c=n>=5?'#22c55e':n>=4?'#3b82f6':n===3?'#f59e0b':'#ef4444';return`<span style="font-weight:700;color:${c}">${v}</span>`;}
+function bFit(f){if(!f||f==='-')return`<span style="color:var(--tx3)">—</span>`;const c=f==='Alto'?'#22c55e':f==='Médio'?'#f59e0b':'#ef4444';return`<span style="font-weight:700;color:${c};font-size:9px">${f}</span>`;}
+
+function renderTabela(data){
+  document.getElementById('tbody').innerHTML=data.map(d=>`<tr>
+    <td style="font-weight:600;color:var(--kv)">${d.n}</td>
+    <td style="font-size:9px">${d.v}</td>
+    <td>${bA(d.a)}</td>
+    <td style="font-size:9px">${d.f}</td>
+    <td style="font-size:9px;color:var(--tx3)">${d.e||'—'}</td>
+    <td>${bS(d.sv)}</td>
+    <td style="font-size:9px;color:var(--tx3)">${d.sg||'—'}</td>
+    <td>${bSc(d.t)}</td><td>${bSc(d.c)}</td><td>${bFit(d.fit)}</td>
+  </tr>`).join('');
+  document.getElementById('fcnt').textContent=`${data.length} registros`;
+}
+function filtrar(){
+  const q=document.getElementById('fsrch').value.toLowerCase();
+  const fa=document.getElementById('farea').value;
+  const fs=document.getElementById('fstat').value;
+  renderTabela(CANDS.filter(d=>{
+    const m=!q||(d.n+d.v+d.e+d.sv+d.sg).toLowerCase().includes(q);
+    return m&&(!fa||d.a===fa)&&(!fs||d.sg===fs);
+  }));
+}
+renderTabela(CANDS);
+
+// ── CHARTS ──
+let CHS=[];
+function getT(){
+  const L=document.body.classList.contains('light');
+  return{g:L?'rgba(0,0,0,0.05)':'rgba(255,255,255,0.05)',t:L?'#8a9cc0':'#4e6a9a'};
+}
+function destroyCharts(){CHS.forEach(c=>c.destroy());CHS=[];}
+function buildCharts(){
+  const{g,t}=getT();
+  const tk={color:t,font:{size:10}};
+  const B={responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}};
+  const add=c=>CHS.push(c);
+
+  add(new Chart('cFonte',{type:'doughnut',data:{datasets:[{data:[96,3,3],backgroundColor:['#3b82f6','#22c55e','#f59e0b'],borderWidth:0}]},options:{...B,cutout:'68%'}}));
+  add(new Chart('cStatus',{type:'doughnut',data:{datasets:[{data:[68,19,6,6,1],backgroundColor:['#4b6a9a','#22c55e','#f59e0b','#60a5fa','#a855f7'],borderWidth:0}]},options:{...B,cutout:'68%'}}));
+  add(new Chart('cArea',{type:'doughnut',data:{datasets:[{data:[55,29,16,1,1],backgroundColor:['#3b82f6','#22c55e','#f59e0b','#ef4444','#a855f7'],borderWidth:0}]},options:{...B,cutout:'65%'}}));
+  add(new Chart('cStatusV',{type:'bar',data:{labels:['Declínio','Reprovado','Próx.etapa','Stand by','Contratado'],datasets:[{data:[56,18,17,2,1],backgroundColor:['#ef4444','#f59e0b','#22c55e','#60a5fa','#22c55e'],borderRadius:5}]},options:{...B,scales:{x:{ticks:tk,grid:{color:g}},y:{ticks:tk,grid:{color:g}}}}}));
+  add(new Chart('cFunil',{type:'bar',data:{labels:['Triagem','Entrev.RH','Ent.Técnica','Case','Finalista','Proposta','Contratado'],datasets:[{data:[59,30,4,3,5,1,1],backgroundColor:['#3b82f6','#60a5fa','#22c55e','#f59e0b','#a855f7','#f59e0b','#22c55e'],borderRadius:5}]},options:{...B,scales:{x:{ticks:{color:t,font:{size:9},maxRotation:25},grid:{color:g}},y:{ticks:tk,grid:{color:g}}}}}));
+  add(new Chart('cAreaEst',{type:'bar',data:{labels:['Triagem','RH','Técnica','Finalista'],datasets:[{label:'Operações',data:[30,16,2,3],backgroundColor:'#3b82f6',borderRadius:3},{label:'Legal AI',data:[18,9,1,2],backgroundColor:'#22c55e',borderRadius:3},{label:'Body Shop',data:[11,5,1,0],backgroundColor:'#f59e0b',borderRadius:3}]},options:{...B,scales:{x:{ticks:{color:t,font:{size:9}},grid:{color:g},stacked:true},y:{ticks:tk,grid:{color:g},stacked:true}},plugins:{legend:{display:true,labels:{color:t,font:{size:9},boxWidth:7}}}}}));
+  add(new Chart('cStatusPie',{type:'doughnut',data:{datasets:[{data:[19,68,6,6,1],backgroundColor:['#22c55e','#4b6a9a','#f59e0b','#60a5fa','#a855f7'],borderWidth:0}]},options:{...B,cutout:'60%'}}));
+  add(new Chart('cTec',{type:'bar',data:{labels:['Score 3','Score 4','Score 5'],datasets:[{data:[15,16,10],backgroundColor:['#f59e0b','#3b82f6','#22c55e'],borderRadius:6}]},options:{...B,scales:{x:{ticks:tk,grid:{color:g}},y:{ticks:tk,grid:{color:g}}}}}));
+  add(new Chart('cComp',{type:'bar',data:{labels:['Score 3','Score 4','Score 5'],datasets:[{data:[6,17,18],backgroundColor:['#f59e0b','#3b82f6','#22c55e'],borderRadius:6}]},options:{...B,scales:{x:{ticks:tk,grid:{color:g}},y:{ticks:tk,grid:{color:g}}}}}));
+  add(new Chart('cFit',{type:'doughnut',data:{datasets:[{data:[19,17,11],backgroundColor:['#22c55e','#f59e0b','#ef4444'],borderWidth:0}]},options:{...B,cutout:'62%'}}));
+  add(new Chart('cScatter',{type:'scatter',data:{datasets:[{data:[{x:5,y:5},{x:3,y:4},{x:4,y:5},{x:5,y:4},{x:3,y:4},{x:3,y:4},{x:3,y:4},{x:4,y:4},{x:4,y:5},{x:3,y:4},{x:4,y:5},{x:3,y:4},{x:4,y:5},{x:4,y:5},{x:4,y:4},{x:4,y:5},{x:3,y:3},{x:3,y:3},{x:4,y:5},{x:4,y:4},{x:4,y:5},{x:3,y:5},{x:3,y:4},{x:5,y:5},{x:3,y:4},{x:5,y:4},{x:4,y:5},{x:3,y:4},{x:3,y:5},{x:5,y:5},{x:4,y:4},{x:4,y:5},{x:5,y:5},{x:3,y:4},{x:4,y:4},{x:5,y:5},{x:4,y:4},{x:3,y:4},{x:4,y:5},{x:5,y:5},{x:4,y:3}],backgroundColor:'rgba(59,130,246,0.5)',pointRadius:5}]},options:{...B,scales:{x:{min:2,max:6,ticks:{...tk,stepSize:1},grid:{color:g},title:{display:true,text:'Score Técnico',color:t,font:{size:9}}},y:{min:2,max:6,ticks:{...tk,stepSize:1},grid:{color:g},title:{display:true,text:'Score Comp.',color:t,font:{size:9}}}}}}));
+  add(new Chart('cFitTec',{type:'bar',data:{labels:['Score 3','Score 4','Score 5'],datasets:[{label:'Alto',data:[4,8,7],backgroundColor:'#22c55e',borderRadius:3},{label:'Médio',data:[7,6,2],backgroundColor:'#f59e0b',borderRadius:3},{label:'Baixo',data:[4,4,1],backgroundColor:'#ef4444',borderRadius:3}]},options:{...B,scales:{x:{ticks:tk,grid:{color:g}},y:{ticks:tk,grid:{color:g}}},plugins:{legend:{display:true,labels:{color:t,font:{size:9},boxWidth:7}}}}}));
+  add(new Chart('cDecl',{type:'bar',data:{labels:['Remuneração','Modelo Híbrido','Não tem interesse','Contrato PJ','Não responde','Outra proposta','Distância','Outros'],datasets:[{data:[20,8,8,5,3,3,3,2],backgroundColor:['#ef4444','#f87171','#f87171','#f59e0b','#f59e0b','#f59e0b','#94a3b8','#64748b'],borderRadius:4}]},options:{...B,indexAxis:'y',scales:{x:{ticks:tk,grid:{color:g}},y:{ticks:{color:t,font:{size:9}},grid:{color:g}}}}}));
+  add(new Chart('cReprov',{type:'bar',data:{labels:['Tec. insuficiente','Overqualification','Outra','Comportamento'],datasets:[{data:[11,6,2,1],backgroundColor:['#ef4444','#f59e0b','#94a3b8','#60a5fa'],borderRadius:5}]},options:{...B,scales:{x:{ticks:tk,grid:{color:g}},y:{ticks:tk,grid:{color:g}}}}}));
+  const sN=['V.Brandão','M.Nascimento','Kelvin','Higor','V.Machado','Wesley','V.Gonçalves','E.Bondezan','Jane S.','G.Mafra','Thales','William','Milton','G.Galvão','G.Frigo','C.Negrão','J.R.Pintaudi','G.Lima','G.Crispim','R.Silva','T.Alessio','F.Fraga','C.Florentino','P.Oliveira','Ivan L.','R.Genovese','Jorge L.','Paulo Chi'];
+  const sP=[null,7000,18000,12000,15000,5000,3500,3500,11000,10000,9500,4000,null,13000,15000,19000,17000,16500,10000,15000,9000,25000,17000,22000,17000,17000,10000,12000];
+  const sO=[8000,null,null,8000,8000,6000,6000,8000,6000,8000,1000,10000,null,8000,8000,8000,15000,10000,6000,7000,7000,12500,16000,12500,12500,12500,10000,10000];
+  add(new Chart('cSalComp',{type:'bar',data:{labels:sN,datasets:[{label:'Pretendido',data:sP,backgroundColor:'rgba(245,158,11,.75)',borderRadius:3},{label:'Ofertado',data:sO,backgroundColor:'rgba(59,130,246,.75)',borderRadius:3}]},options:{...B,scales:{x:{ticks:{color:t,font:{size:8},display:false},grid:{color:g}},y:{ticks:{color:t,font:{size:9},callback:v=>v?'R$'+Math.round(v/1000)+'k':''},grid:{color:g}}},plugins:{legend:{display:true,labels:{color:t,font:{size:9},boxWidth:8}}}}}));
+  add(new Chart('cSalDist',{type:'bar',data:{labels:['Até R$8k','R$8-12k','R$12-18k','Acima R$18k'],datasets:[{data:[3,4,5,2],backgroundColor:['#22c55e','#3b82f6','#f59e0b','#ef4444'],borderRadius:5}]},options:{...B,scales:{x:{ticks:tk,grid:{color:g}},y:{ticks:tk,grid:{color:g}}}}}));
+  add(new Chart('cAreaBar',{type:'bar',data:{labels:['Operações','Legal AI','Body Shop','Comercial','TI'],datasets:[{data:[55,29,16,1,1],backgroundColor:['#3b82f6','#22c55e','#f59e0b','#ef4444','#a855f7'],borderRadius:5}]},options:{...B,scales:{x:{ticks:tk,grid:{color:g}},y:{ticks:tk,grid:{color:g}}}}}));
+  add(new Chart('cVagaSt',{type:'bar',data:{labels:['Declínio','Reprovado','Próx.etapa','Stand by','Contratado'],datasets:[{data:[56,18,17,2,1],backgroundColor:['#ef4444','#f59e0b','#22c55e','#60a5fa','#22c55e'],borderRadius:5}]},options:{...B,scales:{x:{ticks:tk,grid:{color:g}},y:{ticks:tk,grid:{color:g}}}}}));
+}
+function rebuildCharts(){destroyCharts();buildCharts();}
+buildCharts();
+</script>
+</body>
+</html>

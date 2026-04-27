@@ -6,497 +6,387 @@
 <title>Esteira R&S — DeepCenter</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
-:root{
-  --bg:#080f24;--bg2:#0a1228;--bg3:#0d1830;
-  --bd:rgba(255,255,255,0.07);--tx:#c8d8f0;--tx2:#8fa3cc;--tx3:#4e6a9a;
-  --kv:#fff;--cg:rgba(255,255,255,0.05);--ct2:#4e6a9a;
-  --hbg:rgba(255,255,255,0.06);--rh:rgba(0,120,212,0.08);
-  --thb:rgba(255,255,255,0.08);--tdb:rgba(255,255,255,0.04);
-  --ibg:#0d1830;--ibd:rgba(255,255,255,0.08);
-  --inp:#0d1830;--inp-bd:rgba(255,255,255,0.15);
-  --tog:#1a2a50;
-}
-.light{
-  --bg:#f0f4fb;--bg2:#fff;--bg3:#fff;
-  --bd:rgba(0,0,0,0.08);--tx:#2c3e6b;--tx2:#4a5e8a;--tx3:#8a9cc0;
-  --kv:#1a2b52;--cg:rgba(0,0,0,0.05);--ct2:#8a9cc0;
-  --hbg:rgba(0,0,0,0.07);--rh:rgba(0,120,212,0.05);
-  --thb:rgba(0,0,0,0.08);--tdb:rgba(0,0,0,0.04);
-  --ibg:#f5f8ff;--ibd:rgba(0,0,0,0.09);
-  --inp:#f4f7ff;--inp-bd:rgba(0,0,0,0.15);
-  --tog:#dde6f8;
-}
+:root{--bg:#080f24;--bg2:#0a1228;--bg3:#0d1830;--bd:rgba(255,255,255,0.07);--tx:#c8d8f0;--tx2:#8fa3cc;--tx3:#4e6a9a;--kv:#fff;--hbg:rgba(255,255,255,0.06);--rh:rgba(0,120,212,0.08);--thb:rgba(255,255,255,0.08);--tdb:rgba(255,255,255,0.04);--inp:#0d1830;--inp-bd:rgba(255,255,255,0.15);--tog:#1a2a50}
+.light{--bg:#f0f4fb;--bg2:#fff;--bg3:#fff;--bd:rgba(0,0,0,0.08);--tx:#2c3e6b;--tx2:#4a5e8a;--tx3:#8a9cc0;--kv:#1a2b52;--hbg:rgba(0,0,0,0.07);--rh:rgba(0,120,212,0.05);--thb:rgba(0,0,0,0.08);--tdb:rgba(0,0,0,0.04);--inp:#f4f7ff;--inp-bd:rgba(0,0,0,0.15);--tog:#dde6f8}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:system-ui,-apple-system,'Segoe UI',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;font-size:14px}
-
-/* TOPBAR */
 .topbar{background:var(--bg2);border-bottom:1px solid var(--bd);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:999}
 .logo{display:flex;align-items:center;gap:10px}
 .logo-icon{width:30px;height:30px;background:linear-gradient(135deg,#0078D4,#00b4d8);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:12px;flex-shrink:0}
 .logo-name{font-size:13px;font-weight:600;color:var(--kv)}
 .logo-sub{font-size:10px;color:var(--tx3)}
-
-/* TOGGLE */
 .tog{background:var(--tog);border:1px solid var(--bd);border-radius:20px;padding:5px 12px;cursor:pointer;display:flex;align-items:center;gap:6px;font-size:11px;color:var(--tx2);font-family:inherit}
 .tog-track{width:32px;height:17px;background:var(--bd);border-radius:9px;position:relative;pointer-events:none;flex-shrink:0}
 .light .tog-track{background:#0078D4}
 .tog-knob{width:11px;height:11px;background:#fff;border-radius:50%;position:absolute;top:3px;left:3px;transition:transform .2s;pointer-events:none;box-shadow:0 1px 3px rgba(0,0,0,.3)}
 .light .tog-knob{transform:translateX(15px)}
-
-/* TABS */
 .tabs{background:var(--bg2);border-bottom:1px solid var(--bd);display:flex;overflow-x:auto;position:sticky;top:51px;z-index:998;scrollbar-width:none}
 .tabs::-webkit-scrollbar{display:none}
 .tab{padding:0 14px;height:42px;border:none;background:transparent;color:var(--tx3);font-size:11px;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;font-family:inherit;min-width:60px;flex-shrink:0}
 .tab:hover{color:var(--tx2)}
 .tab.on{color:#0078D4;border-bottom-color:#0078D4}
-
-/* PAGES */
 .page{display:none;padding:14px;flex-direction:column;gap:12px}
 .page.on{display:flex}
-
-/* KPI GRID */
 .kgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:9px}
 .kcard{background:var(--bg3);border:1px solid var(--bd);border-radius:10px;padding:12px 14px}
 .klabel{font-size:9px;text-transform:uppercase;letter-spacing:.5px;color:var(--tx3);margin-bottom:5px}
 .kval{font-size:20px;font-weight:700;color:var(--kv)}
-.kdesc{font-size:9px;margin-top:3px;color:var(--tx3)}
 .c-g{color:#22c55e}.c-y{color:#f59e0b}.c-r{color:#ef4444}.c-b{color:#3b82f6}
-
-/* CARDS */
 .card{background:var(--bg3);border:1px solid var(--bd);border-radius:10px;padding:15px}
 .ctitle{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;color:var(--tx3);margin-bottom:12px}
-
-/* GRIDS */
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:11px}
 .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:11px}
-
-/* HBARS */
 .hbars{display:flex;flex-direction:column;gap:6px}
 .hbar-row{display:flex;align-items:center;gap:8px}
-.hbar-lbl{font-size:10px;color:var(--tx2);min-width:130px;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hbar-lbl{font-size:10px;color:var(--tx2);min-width:140px;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .hbar-track{flex:1;background:var(--hbg);border-radius:3px;height:10px;overflow:hidden}
 .hbar-fill{height:100%;border-radius:3px}
 .hbar-val{font-size:10px;color:var(--tx3);min-width:22px;text-align:right;font-weight:600}
-
-/* ALERTS */
-.alert{padding:9px 12px;border-radius:7px;font-size:10px;margin-top:8px;border-left:3px solid;line-height:1.5}
-.alert-r{background:rgba(239,68,68,.08);border-color:#ef4444;color:#ef4444}
-.alert-y{background:rgba(245,158,11,.08);border-color:#f59e0b;color:#f59e0b}
-.alert-g{background:rgba(34,197,94,.08);border-color:#22c55e;color:#22c55e}
-.alert-b{background:rgba(59,130,246,.08);border-color:#3b82f6;color:#3b82f6}
-.light .alert-r{color:#b91c1c}.light .alert-y{color:#92400e}
-.light .alert-g{color:#14532d}.light .alert-b{color:#1e3a8a}
-
-/* FUNIL */
-.funil{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 0}
-.fstep{border-radius:6px;display:flex;align-items:center;justify-content:space-between;padding:7px 14px;font-size:11px;font-weight:500;color:var(--tx)}
-.farrow{border-left:8px solid transparent;border-right:8px solid transparent;border-top:7px solid rgba(128,128,128,.2)}
-
-/* INSIGHTS */
-.igrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:8px;margin-top:8px}
-.ins{background:var(--ibg);border:1px solid var(--ibd);border-radius:8px;padding:10px 12px}
-.ins-t{font-size:10px;font-weight:600;margin-bottom:3px}
-.ins-d{font-size:9px;color:var(--tx3);line-height:1.5}
-
-/* METRIC */
-.mpill{border-radius:8px;padding:9px 12px;margin-bottom:6px;border-left:3px solid}
-.mp-t{font-size:9px;color:var(--tx3);margin-bottom:2px}
-.mp-v{font-size:19px;font-weight:700;color:var(--kv)}
-
-/* LEGEND */
-.leg{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
-.leg-i{display:flex;align-items:center;gap:4px;font-size:9px;color:var(--tx3)}
-.leg-sq{width:8px;height:8px;border-radius:2px;flex-shrink:0}
-
-/* BADGES */
+.funil{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 0;width:100%}
+.fstep{border-radius:6px;display:flex;align-items:center;justify-content:space-between;padding:8px 16px;font-size:11px;font-weight:500;color:var(--tx);width:100%;transition:opacity .2s}
+.fstep-pct{font-size:9px;color:var(--tx3);margin-left:8px}
+.farrow{width:0;height:0;border-left:10px solid transparent;border-right:10px solid transparent;border-top:8px solid rgba(128,128,128,.2);margin:0 auto}
 .badge{display:inline-block;padding:2px 7px;border-radius:20px;font-size:9px;font-weight:500}
 .bo{background:rgba(59,130,246,.15);color:#3b82f6}
 .bl{background:rgba(34,197,94,.15);color:#22c55e}
 .by{background:rgba(245,158,11,.15);color:#f59e0b}
 .br{background:rgba(239,68,68,.15);color:#ef4444}
 .bp{background:rgba(168,85,247,.15);color:#a855f7}
-
-/* TABLE */
+.bg{background:rgba(100,116,139,.15);color:#94a3b8}
 .tbl-wrap{overflow:auto;max-height:480px}
 table{width:100%;border-collapse:collapse;font-size:10px;min-width:700px}
 th{background:var(--bg3);color:var(--tx3);font-size:9px;text-transform:uppercase;letter-spacing:.4px;padding:7px 8px;text-align:left;border-bottom:1px solid var(--thb);position:sticky;top:0;z-index:2}
 td{color:var(--tx2);padding:6px 8px;border-bottom:1px solid var(--tdb)}
 tr:hover td{background:var(--rh)}
-
-/* FILTERS */
 .filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .filters input,.filters select{background:var(--inp);border:1px solid var(--inp-bd);border-radius:7px;padding:8px 10px;color:var(--tx);font-size:11px;font-family:inherit;outline:none}
 .filters input{flex:1;min-width:160px}
-.filters select{min-width:120px}
+.filters select{min-width:140px}
 #fcnt{font-size:10px;color:var(--tx3);white-space:nowrap}
-
-/* RESPONSIVE */
-@media(max-width:600px){
-  .g2,.g3{grid-template-columns:1fr}
-  .kgrid{grid-template-columns:repeat(2,1fr)}
-  .hbar-lbl{min-width:90px;max-width:100px}
-  .tog span{display:none}
-  .logo-sub{display:none}
-}
+@media(max-width:600px){.g2,.g3{grid-template-columns:1fr}.kgrid{grid-template-columns:repeat(2,1fr)}.tog span{display:none}}
 </style>
 </head>
 <body>
-
-<div class="topbar">
-  <div class="logo">
-    <div class="logo-icon">RS</div>
-    <div>
-      <div class="logo-name">Esteira R&amp;S — DeepCenter</div>
-      <div class="logo-sub">Pessoas e Cultura · 102 candidatos · 15/04/2026</div>
-    </div>
-  </div>
-  <button class="tog" onclick="toggleTheme()">
-    <div class="tog-track"><div class="tog-knob"></div></div>
-    <span id="tlbl">Tema escuro</span>
-  </button>
-</div>
-
+<div class="topbar"><div class="logo"><div class="logo-icon">RS</div><div><div class="logo-name">Esteira R&amp;S — DeepCenter</div><div class="logo-sub">Pessoas e Cultura</div></div></div><button class="tog" onclick="toggleTheme()"><div class="tog-track"><div class="tog-knob"></div></div><span id="tlbl">Tema escuro</span></button></div>
 <div class="tabs">
-  <button class="tab on"  id="tb1" onclick="showPage('pg1','tb1')">Geral</button>
-  <button class="tab"     id="tb2" onclick="showPage('pg2','tb2')">Funil</button>
-  <button class="tab"     id="tb3" onclick="showPage('pg3','tb3')">Scores &amp; Fit</button>
-  <button class="tab"     id="tb4" onclick="showPage('pg4','tb4')">Declínios</button>
-  <button class="tab"     id="tb5" onclick="showPage('pg5','tb5')">Salários</button>
-  <button class="tab"     id="tb6" onclick="showPage('pg6','tb6')">Candidatos</button>
+  <button class="tab on" id="tb1" onclick="showPage('pg1','tb1')">Geral</button>
+  <button class="tab" id="tb2" onclick="showPage('pg2','tb2')">Funil</button>
+  <button class="tab" id="tb3" onclick="showPage('pg3','tb3')">Scores &amp; Fit</button>
+  <button class="tab" id="tb4" onclick="showPage('pg4','tb4')">Declínios</button>
+  <button class="tab" id="tb5" onclick="showPage('pg5','tb5')">Salários</button>
+  <button class="tab" id="tb6" onclick="showPage('pg6','tb6')">Candidatos</button>
 </div>
 
-<!-- ====== P1 GERAL ====== -->
+<!-- GERAL -->
 <div id="pg1" class="page on">
   <div class="kgrid">
-    <div class="kcard"><div class="klabel">Total candidatos</div><div class="kval">102</div><div class="kdesc c-b">em processo</div></div>
-    <div class="kcard"><div class="klabel">Em andamento</div><div class="kval c-g">19</div><div class="kdesc c-g">18,6% do total</div></div>
-    <div class="kcard"><div class="klabel">Finalizados</div><div class="kval" style="color:var(--tx2)">68</div><div class="kdesc">66,7%</div></div>
-    <div class="kcard"><div class="klabel">Stand By / Hub</div><div class="kval c-y">12</div><div class="kdesc c-y">banco talentos</div></div>
-    <div class="kcard"><div class="klabel">Contratados</div><div class="kval c-g">1</div><div class="kdesc c-g">Felipe Solera</div></div>
-    <div class="kcard"><div class="klabel">Vagas ativas</div><div class="kval c-b">8</div><div class="kdesc c-b">múltiplas áreas</div></div>
+    <div class="kcard"><div class="klabel">Total candidatos</div><div class="kval" id="kTot">—</div></div>
+    <div class="kcard"><div class="klabel">Em andamento</div><div class="kval c-g" id="kAnd">—</div></div>
+    <div class="kcard"><div class="klabel">Finalizados</div><div class="kval" id="kFin">—</div></div>
+    <div class="kcard"><div class="klabel">Stand By / Hub</div><div class="kval c-y" id="kHub">—</div></div>
+    <div class="kcard"><div class="klabel">Contratados</div><div class="kval c-g" id="kCon">—</div></div>
+    <div class="kcard"><div class="klabel">Vagas ativas *</div><div class="kval c-b" id="kVag">—</div></div>
   </div>
   <div class="g3">
-    <div class="card">
-      <div class="ctitle">Candidatos por vaga</div>
-      <div class="hbars">
-        <div class="hbar-row"><span class="hbar-lbl">Engenheiro de Dados</span><div class="hbar-track"><div class="hbar-fill" style="width:100%;background:#3b82f6"></div></div><span class="hbar-val">37</span></div>
-        <div class="hbar-row"><span class="hbar-lbl">An. Planejamento</span><div class="hbar-track"><div class="hbar-fill" style="width:46%;background:#22c55e"></div></div><span class="hbar-val">17</span></div>
-        <div class="hbar-row"><span class="hbar-lbl">Eng. Dados SAS</span><div class="hbar-track"><div class="hbar-fill" style="width:43%;background:#60a5fa"></div></div><span class="hbar-val">16</span></div>
-        <div class="hbar-row"><span class="hbar-lbl">Dev. Full Stack</span><div class="hbar-track"><div class="hbar-fill" style="width:43%;background:#22c55e"></div></div><span class="hbar-val">16</span></div>
-        <div class="hbar-row"><span class="hbar-lbl">Engenheiro de IA</span><div class="hbar-track"><div class="hbar-fill" style="width:24%;background:#f59e0b"></div></div><span class="hbar-val">9</span></div>
-        <div class="hbar-row"><span class="hbar-lbl">Eng. Dados Backend</span><div class="hbar-track"><div class="hbar-fill" style="width:16%;background:#f59e0b"></div></div><span class="hbar-val">6</span></div>
-        <div class="hbar-row"><span class="hbar-lbl">Closer</span><div class="hbar-track"><div class="hbar-fill" style="width:3%;background:#ef4444"></div></div><span class="hbar-val">1</span></div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="ctitle">Fonte dos candidatos</div>
-      <div style="position:relative;height:150px"><canvas id="cFonte"></canvas></div>
-      <div class="leg"><span class="leg-i"><span class="leg-sq" style="background:#3b82f6"></span>LinkedIn 94%</span><span class="leg-i"><span class="leg-sq" style="background:#22c55e"></span>Catho 3%</span><span class="leg-i"><span class="leg-sq" style="background:#f59e0b"></span>Indicação 3%</span></div>
-    </div>
-    <div class="card">
-      <div class="ctitle">Status geral</div>
-      <div style="position:relative;height:150px"><canvas id="cStatus"></canvas></div>
-      <div class="leg"><span class="leg-i"><span class="leg-sq" style="background:#4b6a9a"></span>Finalizado</span><span class="leg-i"><span class="leg-sq" style="background:#22c55e"></span>Andamento</span><span class="leg-i"><span class="leg-sq" style="background:#f59e0b"></span>Stand/Hub</span></div>
-    </div>
+    <div class="card"><div class="ctitle">Candidatos por vaga</div><div class="hbars" id="hVaga"></div></div>
+    <div class="card"><div class="ctitle">Fonte dos candidatos</div><div style="position:relative;height:150px"><canvas id="cFonte"></canvas></div></div>
+    <div class="card"><div class="ctitle">Status geral</div><div style="position:relative;height:150px"><canvas id="cStatus"></canvas></div></div>
   </div>
   <div class="g2">
-    <div class="card">
-      <div class="ctitle">Distribuição por área</div>
-      <div style="position:relative;height:165px"><canvas id="cArea"></canvas></div>
-      <div class="leg"><span class="leg-i"><span class="leg-sq" style="background:#3b82f6"></span>Operações 54%</span><span class="leg-i"><span class="leg-sq" style="background:#22c55e"></span>Legal AI 28%</span><span class="leg-i"><span class="leg-sq" style="background:#f59e0b"></span>Body Shop 16%</span></div>
-    </div>
-    <div class="card">
-      <div class="ctitle">Status final dos candidatos</div>
-      <div style="position:relative;height:165px"><canvas id="cStatusV"></canvas></div>
-      <div class="alert alert-r">Taxa de declínio: <strong>54,9%</strong> — principal gargalo do processo</div>
-    </div>
+    <div class="card"><div class="ctitle">Distribuição por área</div><div style="position:relative;height:165px"><canvas id="cArea"></canvas></div></div>
+    <div class="card"><div class="ctitle">Status final dos candidatos</div><div style="position:relative;height:165px"><canvas id="cStatusV"></canvas></div></div>
   </div>
-</div>
 
-<!-- ====== P2 FUNIL ====== -->
+<div style="padding:8px 14px 4px;font-size:9px;color:var(--tx3);border-top:1px solid var(--bd);margin-top:4px">* Vagas ativas — aguardando avanço de assinatura do projeto reintegrados</div>
+
+<!-- FUNIL -->
 <div id="pg2" class="page">
   <div class="g2">
     <div class="card">
       <div class="ctitle">Funil do processo seletivo</div>
-      <div class="funil">
-        <div class="fstep" style="width:100%;background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.3)"><span>Triagem</span><span>59</span></div>
-        <div class="farrow"></div>
-        <div class="fstep" style="width:82%;background:rgba(96,165,250,.12);border:1px solid rgba(96,165,250,.25)"><span>Entrevista RH</span><span>30</span></div>
-        <div class="farrow"></div>
-        <div class="fstep" style="width:60%;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.22)"><span>Entrevista Técnica</span><span>4</span></div>
-        <div class="farrow"></div>
-        <div class="fstep" style="width:42%;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.22)"><span>Teste / Case</span><span>3</span></div>
-        <div class="farrow"></div>
-        <div class="fstep" style="width:28%;background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.22)"><span>Finalista / DIR</span><span>5</span></div>
-        <div class="farrow"></div>
-        <div class="fstep" style="width:14%;background:rgba(245,158,11,.14);border:1px solid rgba(245,158,11,.3)"><span>Proposta</span><span>1</span></div>
-        <div class="farrow"></div>
-        <div class="fstep" style="width:8%;background:rgba(34,197,94,.18);border:1px solid rgba(34,197,94,.4)"><span>Contratado</span><span>1</span></div>
-      </div>
+      <div class="funil" id="funil"></div>
     </div>
     <div class="card">
-      <div class="ctitle">Volume por estágio</div>
-      <div style="position:relative;height:260px"><canvas id="cFunil"></canvas></div>
-    </div>
-  </div>
-  <div class="g3">
-    <div class="card">
-      <div class="ctitle">Taxas de conversão</div>
-      <div class="mpill alert-b" style="border-color:#3b82f6;margin-top:4px"><div class="mp-t">Triagem → Entrevista RH</div><div class="mp-v">50,8%</div></div>
-      <div class="mpill alert-g" style="border-color:#22c55e"><div class="mp-t">RH → Etapas avançadas</div><div class="mp-v">26,7%</div></div>
-      <div class="mpill" style="background:rgba(168,85,247,.07);border-left:3px solid #a855f7;border-radius:8px;padding:9px 12px;margin-bottom:6px"><div class="mp-t">Finalista → Contratado</div><div class="mp-v">20,0%</div></div>
-      <div class="mpill alert-r" style="border-color:#ef4444"><div class="mp-t">Taxa geral de declínio</div><div class="mp-v">54,9%</div></div>
-    </div>
-    <div class="card">
-      <div class="ctitle">Estágio × Área</div>
-      <div style="position:relative;height:215px"><canvas id="cAreaEst"></canvas></div>
-    </div>
-    <div class="card">
-      <div class="ctitle">Composição status geral</div>
-      <div style="position:relative;height:215px"><canvas id="cStatusPie"></canvas></div>
-      <div class="leg"><span class="leg-i"><span class="leg-sq" style="background:#22c55e"></span>Andamento</span><span class="leg-i"><span class="leg-sq" style="background:#4b6a9a"></span>Finalizado</span><span class="leg-i"><span class="leg-sq" style="background:#f59e0b"></span>Stand By</span></div>
+      <div class="ctitle">Candidatos por área e estágio</div>
+      <div style="position:relative;height:280px"><canvas id="cAreaEst"></canvas></div>
     </div>
   </div>
 </div>
 
-<!-- ====== P3 SCORES ====== -->
+<!-- SCORES & FIT -->
 <div id="pg3" class="page">
-  <div class="kgrid" style="grid-template-columns:repeat(auto-fit,minmax(130px,1fr))">
-    <div class="kcard"><div class="klabel">Score técnico médio</div><div class="kval c-b">3,88</div><div class="kdesc c-b">41 avaliados</div></div>
-    <div class="kcard"><div class="klabel">Score comp. médio</div><div class="kval c-g">4,29</div><div class="kdesc c-g">41 avaliados</div></div>
-    <div class="kcard"><div class="klabel">Fit Alto</div><div class="kval c-g">19</div><div class="kdesc c-g">40,4% avaliados</div></div>
-    <div class="kcard"><div class="klabel">Fit Médio</div><div class="kval c-y">17</div><div class="kdesc c-y">36,2% avaliados</div></div>
-    <div class="kcard"><div class="klabel">Fit Baixo</div><div class="kval c-r">11</div><div class="kdesc c-r">23,4% avaliados</div></div>
+  <div class="kgrid">
+    <div class="kcard"><div class="klabel">Score Téc. médio</div><div class="kval c-b" id="kStec">—</div></div>
+    <div class="kcard"><div class="klabel">Score Comp. médio</div><div class="kval c-g" id="kScom">—</div></div>
+    <div class="kcard"><div class="klabel">Fit Alto</div><div class="kval c-g" id="kFalt">—</div></div>
+    <div class="kcard"><div class="klabel">Fit Médio</div><div class="kval c-y" id="kFmed">—</div></div>
+    <div class="kcard"><div class="klabel">Fit Baixo</div><div class="kval c-r" id="kFbai">—</div></div>
   </div>
   <div class="g3">
-    <div class="card"><div class="ctitle">Score Técnico</div><div style="position:relative;height:170px"><canvas id="cTec"></canvas></div><div class="leg"><span class="leg-i"><span class="leg-sq" style="background:#f59e0b"></span>3—37%</span><span class="leg-i"><span class="leg-sq" style="background:#3b82f6"></span>4—39%</span><span class="leg-i"><span class="leg-sq" style="background:#22c55e"></span>5—24%</span></div></div>
-    <div class="card"><div class="ctitle">Score Comportamental</div><div style="position:relative;height:170px"><canvas id="cComp"></canvas></div><div class="leg"><span class="leg-i"><span class="leg-sq" style="background:#f59e0b"></span>3—15%</span><span class="leg-i"><span class="leg-sq" style="background:#3b82f6"></span>4—41%</span><span class="leg-i"><span class="leg-sq" style="background:#22c55e"></span>5—44%</span></div></div>
-    <div class="card"><div class="ctitle">Fit Cultura Deep</div><div style="position:relative;height:170px"><canvas id="cFit"></canvas></div><div class="leg"><span class="leg-i"><span class="leg-sq" style="background:#22c55e"></span>Alto 40%</span><span class="leg-i"><span class="leg-sq" style="background:#f59e0b"></span>Médio 36%</span><span class="leg-i"><span class="leg-sq" style="background:#ef4444"></span>Baixo 23%</span></div></div>
+    <div class="card"><div class="ctitle">Score Técnico</div><div style="position:relative;height:170px"><canvas id="cTec"></canvas></div></div>
+    <div class="card"><div class="ctitle">Score Comportamental</div><div style="position:relative;height:170px"><canvas id="cComp"></canvas></div></div>
+    <div class="card"><div class="ctitle">Fit Cultura Deep</div><div style="position:relative;height:170px"><canvas id="cFit"></canvas></div></div>
   </div>
   <div class="g2">
-    <div class="card"><div class="ctitle">Dispersão: Score Técnico × Comportamental</div><div style="position:relative;height:200px"><canvas id="cScatter"></canvas></div><div class="alert alert-g">Candidatos 5×5: <strong>4 perfis</strong> — máxima aderência técnica e comportamental</div></div>
-    <div class="card"><div class="ctitle">Fit Cultural × Score Técnico</div><div style="position:relative;height:200px"><canvas id="cFitTec"></canvas></div><div class="alert alert-y">Score 4 com Fit Alto: <strong>melhor pool</strong> de aproveitamento</div></div>
+    <div class="card"><div class="ctitle">Dispersão Score Técnico x Comportamental</div><div style="position:relative;height:200px"><canvas id="cScatter"></canvas></div></div>
+    <div class="card"><div class="ctitle">Fit Cultural x Score Técnico</div><div style="position:relative;height:200px"><canvas id="cFitTec"></canvas></div></div>
   </div>
 </div>
 
-<!-- ====== P4 DECLÍNIOS ====== -->
+<!-- DECLÍNIOS -->
 <div id="pg4" class="page">
   <div class="kgrid">
-    <div class="kcard"><div class="klabel">Total declínios</div><div class="kval c-r">56</div><div class="kdesc c-r">54,9% candidatos</div></div>
-    <div class="kcard"><div class="klabel">Por remuneração</div><div class="kval c-y">20</div><div class="kdesc c-y">35,7% declínios</div></div>
-    <div class="kcard"><div class="klabel">Total reprovados</div><div class="kval c-y">18</div><div class="kdesc c-y">17,6% do total</div></div>
-    <div class="kcard"><div class="klabel">Téc. insuficiente</div><div class="kval">11</div><div class="kdesc">61% reprovações</div></div>
+    <div class="kcard"><div class="klabel">Total declínios</div><div class="kval c-r" id="kDecl">—</div></div>
+    <div class="kcard"><div class="klabel">Por remuneração</div><div class="kval c-y" id="kRem">—</div></div>
+    <div class="kcard"><div class="klabel">Total reprovados</div><div class="kval c-y" id="kRep">—</div></div>
+    <div class="kcard"><div class="klabel">Téc. insuficiente</div><div class="kval" id="kTecR">—</div></div>
   </div>
   <div class="g2">
-    <div class="card">
-      <div class="ctitle">Motivos de declínio (candidato)</div>
-      <div style="position:relative;height:215px"><canvas id="cDecl"></canvas></div>
-      <div class="alert alert-r"><strong>Remuneração + Modelo + PJ = 33</strong> — 59% das perdas são estruturais</div>
-    </div>
-    <div class="card">
-      <div class="ctitle">Motivos de reprovação (empresa)</div>
-      <div style="position:relative;height:215px"><canvas id="cReprov"></canvas></div>
-      <div class="alert alert-y"><strong>Overqualification: 6 perfis</strong> — recomendados para Talent Hub</div>
-    </div>
-  </div>
-  <div class="card">
-    <div class="ctitle">Análise estratégica das perdas</div>
-    <div class="igrid">
-      <div class="ins" style="border-color:rgba(239,68,68,.2)"><div class="ins-t" style="color:#ef4444">Remuneração (20)</div><div class="ins-d">Budget abaixo do mercado. Revisar faixas salariais ou ajustar o perfil buscado.</div></div>
-      <div class="ins" style="border-color:rgba(245,158,11,.2)"><div class="ins-t" style="color:#f59e0b">Modelo/PJ/Híbrido (13)</div><div class="ins-d">Candidatos recusam PJ ou presencial. Avaliar flexibilidade ou comunicar melhor.</div></div>
-      <div class="ins" style="border-color:rgba(59,130,246,.2)"><div class="ins-t" style="color:#3b82f6">Sem resposta/interesse (11)</div><div class="ins-d">Não engajaram. Rever abordagem e timing das triagens.</div></div>
-      <div class="ins" style="border-color:rgba(34,197,94,.2)"><div class="ins-t" style="color:#22c55e">Overqualification (6)</div><div class="ins-d">Perfis acima do esperado — 6 já no Talent Hub para futuras vagas.</div></div>
-      <div class="ins" style="border-color:rgba(239,68,68,.2)"><div class="ins-t" style="color:#ef4444">Técnico insuficiente (11)</div><div class="ins-d">Candidatos abaixo da senioridade chegam ao RH. Reforçar triagem.</div></div>
-      <div class="ins" style="border-color:rgba(168,85,247,.2)"><div class="ins-t" style="color:#a855f7">Aproveitamento: 1,0%</div><div class="ins-d">1 contratação em 102. Qualificar leads antes do processo formal.</div></div>
-    </div>
+    <div class="card"><div class="ctitle">Motivos de declínio</div><div style="position:relative;height:250px"><canvas id="cDecl"></canvas></div></div>
+    <div class="card"><div class="ctitle">Motivos de reprovação</div><div style="position:relative;height:250px"><canvas id="cReprov"></canvas></div></div>
   </div>
 </div>
 
-<!-- ====== P5 SALÁRIOS ====== -->
+<!-- SALÁRIOS -->
 <div id="pg5" class="page">
   <div class="kgrid">
-    <div class="kcard"><div class="klabel">Média pretendida</div><div class="kval c-y">R$12.271</div><div class="kdesc c-y">14 candidatos</div></div>
-    <div class="kcard"><div class="klabel">Média ofertada</div><div class="kval c-b">R$9.265</div><div class="kdesc c-b">17 candidatos</div></div>
-    <div class="kcard"><div class="klabel">GAP médio</div><div class="kval c-r">R$3.006</div><div class="kdesc c-r">candidato +32%</div></div>
-    <div class="kcard"><div class="klabel">Maior pretensão</div><div class="kval">R$25.000</div><div class="kdesc">caso extremo</div></div>
+    <div class="kcard"><div class="klabel">Média pretendida</div><div class="kval c-y" id="kMpret">—</div></div>
+    <div class="kcard"><div class="klabel">Média ofertada</div><div class="kval c-b" id="kMofer">—</div></div>
+    <div class="kcard"><div class="klabel">GAP médio</div><div class="kval c-r" id="kGap">—</div></div>
   </div>
-  <div class="g2">
-    <div class="card"><div class="ctitle">Pretendido vs. Ofertado</div><div style="position:relative;height:220px"><canvas id="cSalComp"></canvas></div><div class="leg"><span class="leg-i"><span class="leg-sq" style="background:#f59e0b"></span>Pretendido</span><span class="leg-i"><span class="leg-sq" style="background:#3b82f6"></span>Ofertado</span></div></div>
-    <div class="card"><div class="ctitle">Faixas salariais pretendidas</div><div style="position:relative;height:220px"><canvas id="cSalDist"></canvas></div><div class="leg"><span class="leg-i"><span class="leg-sq" style="background:#22c55e"></span>Até R$8k</span><span class="leg-i"><span class="leg-sq" style="background:#3b82f6"></span>R$8-12k</span><span class="leg-i"><span class="leg-sq" style="background:#f59e0b"></span>R$12-18k</span><span class="leg-i"><span class="leg-sq" style="background:#ef4444"></span>+R$18k</span></div></div>
-  </div>
-  <div class="g2">
-    <div class="card"><div class="ctitle">Candidatos por área</div><div style="position:relative;height:175px"><canvas id="cAreaBar"></canvas></div></div>
-    <div class="card"><div class="ctitle">Status final por contagem</div><div style="position:relative;height:175px"><canvas id="cVagaSt"></canvas></div></div>
+  <div class="card">
+    <div class="ctitle">Faixas salariais pretendidas</div>
+    <div style="position:relative;height:250px"><canvas id="cSalDist"></canvas></div>
   </div>
 </div>
 
-<!-- ====== P6 CANDIDATOS ====== -->
+<!-- CANDIDATOS -->
 <div id="pg6" class="page">
   <div class="filters">
     <input type="search" id="fsrch" placeholder="Buscar nome, vaga, status..." oninput="filtrar()">
     <select id="farea" onchange="filtrar()">
       <option value="">Todas as áreas</option>
-      <option>Operações</option><option>Legal AI</option><option>Body Shop</option><option>Comercial</option><option>TI</option>
+      <option>Operações</option>
+      <option>Legal AI</option>
+      <option>Body Shop</option>
+      <option>Comercial</option>
+      <option>Tecnologia da Informação</option>
     </select>
     <select id="fstat" onchange="filtrar()">
       <option value="">Todos os status</option>
-      <option>Andamento</option><option>Finalizado</option><option>Stand By</option><option>Talent Hub</option><option>Congelado</option>
+      <option>Andamento</option>
+      <option>Finalizado</option>
+      <option>Stand By</option>
+      <option>Talent Hub</option>
+      <option>Congelado</option>
+      <option>Cancelado</option>
     </select>
-    <span id="fcnt">102 registros</span>
+    <span id="fcnt"></span>
   </div>
   <div class="card" style="padding:0;overflow:hidden">
     <div class="tbl-wrap">
-      <table><thead><tr>
-        <th>Candidato</th><th>Vaga</th><th>Área</th><th>Fonte</th>
-        <th>Estágio</th><th>Status</th><th>Geral</th><th>Téc.</th><th>Comp.</th><th>Fit</th>
-      </tr></thead><tbody id="tbody"></tbody></table>
+      <table><thead><tr><th>Candidato</th><th>Vaga</th><th>Área</th><th>Fonte</th><th>Estágio</th><th>Status Vaga</th><th>Status Geral</th><th>Téc.</th><th>Comp.</th><th>Fit</th></tr></thead>
+      <tbody id="tbody"></tbody></table>
     </div>
   </div>
 </div>
 
+<script id="dados" type="application/json">[{"n": "Vitor Brandão", "v": "Engenheiro de Dados", "a": "Operações", "f": "LinkedIn", "e": "Finalista / Entrevista com DIR", "sv": "Declínio", "sg": "Finalizado", "t": "5", "c": "5", "fit": "Alto", "vp": null, "vo": 8000.0, "md": "Remuneração", "mr": ""}, {"n": "Marcos Nascimento", "v": "Engenheiro de Dados", "a": "Operações", "f": "LinkedIn", "e": "Entrevista com o RH", "sv": "Reprovado", "sg": "Finalizado", "t": "3", "c": "4", "fit": "Médio", "vp": 7000.0, "vo": null, "md": "", "mr": "Conhecimento técnico insuficiente"}, {"n": "Lucas Damasceno", "v": "Engenheiro de Dados", "a": "Operações", "f": "LinkedIn", "e": "Entrevista com o RH", "sv": "Declínio", "sg": "Finalizado", "t": "4", "c": "5", "fit": "Alto", "vp": null, "vo": 8000.0, "md": "Candidato não responde", "mr": ""}, {"n": "Kelvin Willian", "v": "Engenheiro de Dados", "a": "Operações", "f": "LinkedIn", "e": "Entrevista com o RH", "sv": "Reprovado", "sg": "Talent Hub", "t": "5", "c": "4", "fit": "Alto", "vp": 18000.0, "vo": null, "md": "", "mr": "Overqualification"}, {"n": "Marcos Lisboa", "v": "Engenheiro de Dados", "a": "Operações", "f": "LinkedIn", "e": "Entrevista com o RH", "sv": "Reprovado", "sg": "Stand By", "t": "3", "c": "4", "fit": "Baixo", "vp": null, "vo": null, "md": "", "mr": "Conhecimento técnico insuficiente"}, {"n": "Gianlucca A.", "v": "Engenheiro de Dados", "a": "Operações", "f": "LinkedIn", "e": "Entrevista com o RH", "sv": "Reprovado", "sg": "Stand By", "t": "3", "c": "4", "fit": "Médio", "vp": 6500.0, "vo": null, "md": "", "mr": "Conhecimento técnico insuficiente"}, {"n": "Dennis Sanches", "v": "Engenheiro de Dados", "a": "Operações", "f": "Indicação", "e": "Triagem", "sv": "Reprovado", "sg": "Finalizado", "t": "3", "c": "-", "fit": "Baixo", "vp": null, "vo": null, "md": "", "mr": "Conhecimento técnico insuficiente"}, {"n": "Nicolas Matos", "v": "Engenheiro de Dados", "a": "Operações", "f": "LinkedIn", "e": "Triagem", "sv": "Reprovado", "sg": "Finalizado", "t": "3", "c": "4", "fit": "Baixo", "vp": null, "vo": null, "md": "", "mr": "Conhecimento técnico insuficiente"}, {"n": "Maysa Kethelyn", "v": "Closer", "a": "Comercial", "f": "LinkedIn", "e": "Entrevista com o RH", "sv": "Próxima etapa", "sg": "Congelado", "t": "3", "c": "3", "fit": "Alto", "vp": 8000.0, "vo": null, "md": "", "mr": ""}, {"n": "Guilherme Andrade", "v": "Engenheiro de Dados", "a": "Operações", "f": "LinkedIn", "e": "Entrevista com o RH", "sv": "Declínio", "sg": "Stand By", "t": "4", "c": "4", "fit": "Médio", "vp": null, "vo": null, "md": "Remuneração", "mr": ""}, {"n": "Felipe Solera", "v": "Engenheiro de Dados", "a": "Operações", "f": "LinkedIn", "e": "Proposta", "sv": "Contratado", "sg": "Finalizado", "t": "4", "c": "5", "fit": "Alto", "vp": 6000.0, "vo": 8000.0, "md": "", "mr": ""}, {"n": "Felipe Santos", "v": "Engenheiro de Dados", "a": "Operações", "f": "LinkedIn", "e": "Entrevista com o RH", "sv": "Declínio", "sg": "Finalizado", "t": "3", "c": "4", "fit": "Baixo", "vp": null, "vo": null, "md": "", "mr": ""}, {"n": "Marcos Vinicius", "v": "Engenheiro de Dados", "a": "Operações", "f": "LinkedIn", "e": "Entrevista com o RH", "sv": "Declínio", "sg": "Finalizado", "t": "4", "c": "5", "fit": "Médio", "vp": null, "vo": null, "md": "", "mr": ""}, {"n": "Guilherme Mafra", "v": "Engenheiro de Dados", "a": "Operações", "f": "Catho", "e": "Entrevista com o RH", "sv": "Reprovado", "sg": "Talent Hub", "t": "4", "c": "5", "fit": "Alto", "vp": 10000.0, "vo": 8000.0, "md": "Remuneração", "mr": "Overqualification"}, {"n": "Hugo Saldanha", "v": "Engenheiro de Dados", "a": "Operações", "f": "LinkedIn", "e": "Triagem", "sv": "Reprovado", "sg": "Stand By", "t": "-", "c": "-", "fit": "Médio", "vp": null, "vo": null, "md": "", "mr": "Outra"}, {"n": "Higor Lins", "v": "Engenheiro de Dados", "a": "Operações", "f": "Catho", "e": "Triagem", "sv": "Declínio", "sg": "Talent Hub", "t": "-", "c": "-", "fit": "Médio", "vp": 12000.0, "vo": 8000.0, "md": "Remuneração", "mr": ""}, {"n": "Vinicius Machado", "v": "Engenheiro de Dados", "a": "Operações", "f": "LinkedIn", "e": "Entrevista com o RH", "sv": "Declínio", "sg": "Talent Hub", "t": "4", "c": "4", "fit": "Médio", "vp": 15000.0, "vo": 8000.0, "md": "Remuneração", "mr": ""}, {"n": "Wesley Lima", "v": "Analista de Planejamento", "a": "Operações", "f": "LinkedIn", "e": "Entrevista com o RH", "sv": "Próxima etapa", "sg": "Andamento", "t": "4", "c": "5", "fit": "Alto", "vp": 5000.0, "vo": 6000.0, "md": "", "mr": ""}, {"n": "Vinicius Gonçalves", "v": "Analista de Planejamento", "a": "Operações", "f": "LinkedIn", "e": "Entrevista com o RH", "sv": "Reprovado", "sg": "Finalizado", "t": "3", "c": "3", "fit": "Baixo", "vp": 3500.0, "vo": 6000.0, "md": "", "mr": "Conhecimento técnico insuficiente"}, {"n": "Eduardo Bondezan", "v": "Analista de Planejamento", "a": "Operações", "f": "LinkedIn", "e": "Entrevista com o RH", "sv": "Reprovado", "sg": "Finalizado", "t": "3", "c": "3", "fit": "Baixo", "vp": 3500.0, "vo": 8000.0, "md": "", "mr": "Conhecimento técnico insuficiente"}, {"n": "Jane Santos", "v": "Analista de Planejamento", "a": "Operações", "f": "LinkedIn", "e": "Entrevista com o RH", "sv": "Declínio", "sg": "Talent Hub", "t": "4", "c": "5", "fit": "Alto", "vp": 11000.0, "vo": 6000.0, "md": "", "mr": "Overqualification"}, {"n": "Michel Carvalho", "v": "Desenvolvedor Full Stack", "a": "Operações", "f": "LinkedIn", "e": "Entrevista com o RH", "sv": "Reprovado", "sg": "Finalizado", "t": "3", "c": "4", "fit": "Médio", "vp": null, "vo": 10000.0, "md": "", "mr": "Conhecimento técnico insuficiente"}, {"n": "Lucas Bonavina", "v": "Desenvolvedor Full Stack", "a": "Operações", "f": "LinkedIn", "e": "Triagem", "sv": "Declínio", "sg": "Stand By", "t": "-", "c": "-", "fit": "Médio", "vp": null, "vo": null, "md": "Recebeu outra proposta", "mr": ""}, {"n": "Thales Cirino", "v": "Desenvolvedor Full Stack", "a": "Operações", "f": "LinkedIn", "e": "Teste / Case", "sv": "Reprovado", "sg": "Finalizado", "t": "4", "c": "5", "fit": "Alto", "vp": 9500.0, "vo": 1000.0, "md": "", "mr": "Senioridade"}, {"n": "Celso Ricardo", "v": "Desenvolvedor Full Stack", "a": "Operações", "f": "Catho", "e": "Entrevista com o RH", "sv": "Reprovado", "sg": "Finalizado", "t": "3", "c": "5", "fit": "Baixo", "vp": null, "vo": null, "md": "", "mr": "Conhecimento técnico insuficiente"}, {"n": "William Silva", "v": "Desenvolvedor Full Stack", "a": "Operações", "f": "LinkedIn", "e": "Entrevista com o RH", "sv": "Reprovado", "sg": "Finalizado", "t": "3", "c": "4", "fit": "Baixo", "vp": 4000.0, "vo": 10000.0, "md": "", "mr": "Conhecimento técnico insuficiente"}, {"n": "Danilo Moreira Salve", "v": "Engenheiro de IA", "a": "Legal AI", "f": "LinkedIn", "e": "Finalista / Entrevista com DIR", "sv": "Próxima etapa", "sg": "Andamento", "t": "", "c": "", "fit": "Alto", "vp": null, "vo": null, "md": "", "mr": ""}, {"n": "Ruan dos Santos Carvalho", "v": "Engenheiro de IA", "a": "Legal AI", "f": "LinkedIn", "e": "Finalista / Entrevista com DIR", "sv": "Próxima etapa", "sg": "Andamento", "t": "", "c": "", "fit": "Médio", "vp": null, "vo": null, "md": "", "mr": ""}, {"n": "João Ricardo Pintaudi", "v": "Engenheiro de IA", "a": "Legal AI", "f": "LinkedIn", "e": "Entrevista com o RH", "sv": "Declínio", "sg": "Finalizado", "t": "5", "c": "5", "fit": "Alto", "vp": 17000.0, "vo": 15000.0, "md": "Remuneração", "mr": ""}, {"n": "Klaus Bleinat", "v": "Engenheiro de IA", "a": "Legal AI", "f": "Indicação", "e": "Entrevista com o RH", "sv": "Reprovado", "sg": "Finalizado", "t": "3", "c": "3", "fit": "Baixo", "vp": null, "vo": null, "md": "", "mr": "Conhecimento técnico insuficiente"}, {"n": "Allan Medeiros", "v": "Engenheiro de IA", "a": "Legal AI", "f": "LinkedIn", "e": "Finalista / Entrevista com DIR", "sv": "Próxima etapa", "sg": "Andamento", "t": "", "c": "", "fit": "", "vp": null, "vo": null, "md": "", "mr": ""}, {"n": "Phillipe Ramalho", "v": "Engenheiro de Dados", "a": "Tecnologia da Informação", "f": "LinkedIn", "e": "Triagem", "sv": "Declínio", "sg": "Finalizado", "t": "-", "c": "-", "fit": "", "vp": null, "vo": null, "md": "Modelo Híbrido", "mr": ""}, {"n": "Adonias Barros", "v": "Engenheiro de Dados", "a": "Operações", "f": "LinkedIn", "e": "Triagem", "sv": "Declínio", "sg": "Finalizado", "t": "-", "c": "-", "fit": "", "vp": null, "vo": null, "md": "Contrato PJ", "mr": ""}, {"n": "Gabriel Angelo Mendes", "v": "Engenheiro de Dados", "a": "Operações", "f": "LinkedIn", "e": "Triagem", "sv": "Declínio", "sg": "Finalizado", "t": "-", "c": "-", "fit": "", "vp": null, "vo": null, "md": "Não tem interesse", "mr": ""}, {"n": "Mayke Ribeiro", "v": "Engenheiro de Dados", "a": "Operações", "f": "LinkedIn", "e": "Triagem", "sv": "Declínio", "sg": "Finalizado", "t": "-", "c": "-", "fit": "", "vp": 15000.0, "vo": 8000.0, "md": "Remuneração", "mr": ""}, {"n": "Yuri Morais", "v": "Engenheiro de Dados", "a": "Operações", "f": "LinkedIn", "e": "Triagem", "sv": "Declínio", "sg": "Finalizado", "t": "-", "c": "-", "fit": "", "vp": null, "vo": null, "md": "Modelo Híbrido", "mr": ""}, {"n": "Guilherme de Oliveira", "v": "Engenheiro de Dados", "a": "Operações", "f": "LinkedIn", "e": "Triagem", "sv": "Declínio", "sg": "Finalizado", "t": "-", "c": "-", "fit": "", "vp": null, "vo": null, "md": "Distância", "mr": ""}, {"n": "Arnaldo Leandro", "v": "Engenheiro de Dados SAS", "a": "Body Shop", "f": "LinkedIn", "e": "Entrevista com o RH", "sv": "Declínio", "sg": "Finalizado", "t": "3", "c": "4", "fit": "Médio", "vp": null, "vo": null, "md": "Contrato PJ", "mr": ""}, {"n": "Miguel Cruz", "v": "Engenheiro de Dados", "a": "Operações", "f": "LinkedIn", "e": "Triagem", "sv": "Declínio", "sg": "Finalizado", "t": "-", "c": "-", "fit": "", "vp": null, "vo": null, "md": "Não tem interesse", "mr": ""}, {"n": "Lucas Viana", "v": "Engenheiro de Dados", "a": "Operações", "f": "LinkedIn", "e": "Triagem", "sv": "Declínio", "sg": "Finalizado", "t": "-", "c": "-", "fit": "", "vp": null, "vo": null, "md": "Modelo Híbrido", "mr": ""}, {"n": "Pedro Tito", "v": "Engenheiro de Dados", "a": "Operações", "f": "LinkedIn", "e": "Entrevista com o RH", "sv": "Reprovado", "sg": "Talent Hub", "t": "5", "c": "5", "fit": "Alto", "vp": null, "vo": 8000.0, "md": "", "mr": "Overqualification"}, {"n": "Milton Moura", "v": "Engenheiro de Dados", "a": "Operações", "f": "LinkedIn", "e": "Entrevista com o RH", "sv": "Declínio", "sg": "Finalizado", "t": "4", "c": "4", "fit": "Alto", "vp": null, "vo": null, "md": "Distância", "mr": ""}, {"n": "Gustavo Galvão", "v": "Engenheiro de Dados", "a": "Operações", "f": "LinkedIn", "e": "Entrevista com o RH", "sv": "Reprovado", "sg": "Finalizado", "t": "5", "c": "4", "fit": "Médio", "vp": 13000.0, "vo": 8000.0, "md": "", "mr": "Overqualification"}, {"n": "Gabriel Frigo", "v": "Engenheiro de Dados", "a": "Operações", "f": "LinkedIn", "e": "Entrevista com o RH", "sv": "Declínio", "sg": "Finalizado", "t": "5", "c": "5", "fit": "Alto", "vp": 15000.0, "vo": 8000.0, "md": "Remuneração", "mr": ""}, {"n": "Leandro Chinelli", "v": "Engenheiro de Dados", "a": "Operações", "f": "LinkedIn", "e": "Triagem", "sv": "Declínio", "sg": "Finalizado", "t": "-", "c": "-", "fit": "", "vp": null, "vo": null, "md": "Não tem interesse", "mr": ""}, {"n": "Christian Negrão", "v": "Engenheiro de Dados", "a": "Operações", "f": "LinkedIn", "e": "Entrevista com o RH", "sv": "Reprovado", "sg": "Finalizado", "t": "5", "c": "5", "fit": "Alto", "vp": 19000.0, "vo": 8000.0, "md": "", "mr": "Overqualification"}, {"n": "Matheus Sousa Serafim", "v": "Engenheiro de Dados", "a": "Operações", "f": "LinkedIn", "e": "Triagem", "sv": "Declínio", "sg": "Finalizado", "t": "-", "c": "-", "fit": "", "vp": 13000.0, "vo": 8000.0, "md": "Remuneração", "mr": ""}, {"n": "Pedro Stoppa", "v": "Engenheiro de Dados", "a": "Operações", "f": "LinkedIn", "e": "Entrevista com o RH", "sv": "Reprovado", "sg": "Finalizado", "t": "4", "c": "3", "fit": "Baixo", "vp": null, "vo": null, "md": "", "mr": "Comportamento"}, {"n": "João Mendonça", "v": "Engenheiro de IA", "a": "Legal AI", "f": "LinkedIn", "e": "Triagem", "sv": "Declínio", "sg": "Finalizado", "t": "-", "c": "-", "fit": "", "vp": 18000.0, "vo": 15000.0, "md": "Remuneração", "mr": ""}, {"n": "Walter Matheus", "v": "Engenheiro de Dados", "a": "Operações", "f": "LinkedIn", "e": "Triagem", "sv": "Declínio", "sg": "Finalizado", "t": "-", "c": "-", "fit": "", "vp": null, "vo": null, "md": "Candidato não responde", "mr": ""}, {"n": "Marcelo B.", "v": "Engenheiro de Dados", "a": "Operações", "f": "LinkedIn", "e": "Triagem", "sv": "Declínio", "sg": "Finalizado", "t": "-", "c": "-", "fit": "", "vp": null, "vo": null, "md": "Candidato não responde", "mr": ""}, {"n": "Paulo Henrique Souza", "v": "Engenheiro de Dados", "a": "Operações", "f": "LinkedIn", "e": "Triagem", "sv": "Declínio", "sg": "Finalizado", "t": "-", "c": "-", "fit": "", "vp": null, "vo": null, "md": "Candidato não responde", "mr": ""}, {"n": "Ygor Dias", "v": "Engenheiro de Dados SAS", "a": "Body Shop", "f": "LinkedIn", "e": "Triagem", "sv": "Declínio", "sg": "Finalizado", "t": "-", "c": "-", "fit": "", "vp": null, "vo": null, "md": "Não tem interesse", "mr": ""}, {"n": "Lucas Yoshida", "v": "Engenheiro de Dados", "a": "Operações", "f": "LinkedIn", "e": "Triagem", "sv": "Declínio", "sg": "Finalizado", "t": "-", "c": "-", "fit": "", "vp": null, "vo": null, "md": "Modelo Híbrido", "mr": ""}, {"n": "Emilson Martins", "v": "Engenheiro de Dados", "a": "Operações", "f": "LinkedIn", "e": "Triagem", "sv": "Declínio", "sg": "Finalizado", "t": "-", "c": "-", "fit": "", "vp": null, "vo": null, "md": "Não tem interesse", "mr": ""}, {"n": "Andre Laganaro", "v": "Engenheiro de IA", "a": "Legal AI", "f": "LinkedIn", "e": "Triagem", "sv": "Declínio", "sg": "Finalizado", "t": "", "c": "", "fit": "", "vp": null, "vo": null, "md": "Remuneração", "mr": ""}, {"n": "Daniel Mendes", "v": "Engenheiro de IA", "a": "Legal AI", "f": "LinkedIn", "e": "Triagem", "sv": "", "sg": "Andamento", "t": "", "c": "", "fit": "", "vp": null, "vo": null, "md": "", "mr": ""}, {"n": "João Pedro Tonello", "v": "Engenheiro de IA", "a": "Legal AI", "f": "LinkedIn", "e": "Triagem", "sv": "", "sg": "Andamento", "t": "", "c": "", "fit": "", "vp": null, "vo": null, "md": "", "mr": ""}, {"n": "Gabriel Victor", "v": "Desenvolvedor Full Stack", "a": "Legal AI", "f": "LinkedIn", "e": "Teste / Case", "sv": "Próxima etapa", "sg": "Andamento", "t": "", "c": "", "fit": "", "vp": null, "vo": null, "md": "", "mr": ""}, {"n": "Daniel Dollay", "v": "Desenvolvedor Full Stack", "a": "Legal AI", "f": "LinkedIn", "e": "Triagem", "sv": "Declínio", "sg": "Finalizado", "t": "-", "c": "-", "fit": "", "vp": null, "vo": null, "md": "Distância", "mr": ""}, {"n": "Jessé Santana", "v": "Desenvolvedor Full Stack", "a": "Operações", "f": "LinkedIn", "e": "Teste / Case", "sv": "Declínio", "sg": "Finalizado", "t": "5", "c": "5", "fit": "Alto", "vp": null, "vo": 10000.0, "md": "Motivos pessoais", "mr": ""}, {"n": "Luiz Amaro", "v": "Desenvolvedor Full Stack", "a": "Legal AI", "f": "LinkedIn", "e": "Teste / Case", "sv": "Próxima etapa", "sg": "Andamento", "t": "4", "c": "4", "fit": "Alto", "vp": 5000.0, "vo": null, "md": "", "mr": ""}, {"n": "Marcone Santos", "v": "Desenvolvedor Full Stack", "a": "Legal AI", "f": "LinkedIn", "e": "Triagem", "sv": "Declínio", "sg": "Finalizado", "t": "-", "c": "-", "fit": "", "vp": null, "vo": null, "md": "Modelo Híbrido", "mr": ""}, {"n": "Eduardo Esteves", "v": "Desenvolvedor Full Stack", "a": "Legal AI", "f": "LinkedIn", "e": "Entrevista com o RH", "sv": "Declínio", "sg": "Finalizado", "t": "3", "c": "4", "fit": "", "vp": null, "vo": null, "md": "Contrato PJ", "mr": ""}, {"n": "Gabriel Oliveira", "v": "Engenheiro de Dados Backend", "a": "Legal AI", "f": "LinkedIn", "e": "Triagem", "sv": "Declínio", "sg": "Finalizado", "t": "-", "c": "-", "fit": "", "vp": null, "vo": null, "md": "Modelo Híbrido", "mr": ""}, {"n": "Lucas Alexandre", "v": "Engenheiro de Dados Backend", "a": "Legal AI", "f": "LinkedIn", "e": "Entrevista com o RH", "sv": "Declínio", "sg": "Finalizado", "t": "3", "c": "4", "fit": "", "vp": null, "vo": null, "md": "Modelo Híbrido", "mr": ""}, {"n": "Thais Naberezny", "v": "Engenheiro de Dados Backend", "a": "Legal AI", "f": "LinkedIn", "e": "Triagem", "sv": "Declínio", "sg": "Finalizado", "t": "-", "c": "-", "fit": "", "vp": null, "vo": null, "md": "Contrato PJ", "mr": ""}, {"n": "Juliana Menezes", "v": "Engenheiro de Dados Backend", "a": "Legal AI", "f": "LinkedIn", "e": "Triagem", "sv": "Declínio", "sg": "Finalizado", "t": "-", "c": "-", "fit": "", "vp": null, "vo": null, "md": "Modelo Híbrido", "mr": ""}, {"n": "Marcos Pablo", "v": "Engenheiro de Dados Backend", "a": "Legal AI", "f": "LinkedIn", "e": "Triagem", "sv": "Declínio", "sg": "Finalizado", "t": "-", "c": "-", "fit": "", "vp": null, "vo": null, "md": "Não tem interesse", "mr": ""}, {"n": "Gustavo Lima", "v": "Engenheiro de Dados Backend", "a": "Legal AI", "f": "LinkedIn", "e": "Entrevista com o RH", "sv": "Declínio", "sg": "Finalizado", "t": "4", "c": "4", "fit": "Médio", "vp": 16500.0, "vo": 10000.0, "md": "Remuneração", "mr": ""}, {"n": "Vivian Rezende", "v": "Analista de Planejamento", "a": "Legal AI", "f": "LinkedIn", "e": "Triagem", "sv": "Declínio", "sg": "Finalizado", "t": "-", "c": "-", "fit": "", "vp": null, "vo": null, "md": "Contrato PJ", "mr": ""}, {"n": "Rogerio C.", "v": "Analista de Planejamento", "a": "Legal AI", "f": "LinkedIn", "e": "Triagem", "sv": "Declínio", "sg": "Finalizado", "t": "-", "c": "-", "fit": "", "vp": null, "vo": null, "md": "Não tem interesse", "mr": ""}, {"n": "Thiago Bruno", "v": "Analista de Planejamento", "a": "Legal AI", "f": "LinkedIn", "e": "Triagem", "sv": "Declínio", "sg": "Finalizado", "t": "-", "c": "-", "fit": "", "vp": null, "vo": null, "md": "Não tem interesse", "mr": ""}, {"n": "David Paiva", "v": "Analista de Planejamento", "a": "Legal AI", "f": "LinkedIn", "e": "Triagem", "sv": "Declínio", "sg": "Finalizado", "t": "-", "c": "-", "fit": "", "vp": null, "vo": null, "md": "Não tem interesse", "mr": ""}, {"n": "Decio Junior", "v": "Analista de Planejamento", "a": "Legal AI", "f": "LinkedIn", "e": "Triagem", "sv": "Declínio", "sg": "Finalizado", "t": "-", "c": "-", "fit": "", "vp": null, "vo": null, "md": "Não tem interesse", "mr": ""}, {"n": "Danielly Liz", "v": "Analista de Planejamento", "a": "Operações", "f": "LinkedIn", "e": "Entrevista com o RH", "sv": "Reprovado", "sg": "Stand By", "t": "3", "c": "5", "fit": "Médio", "vp": null, "vo": null, "md": "", "mr": "Outra"}, {"n": "Vagner Nishimura", "v": "Analista de Planejamento", "a": "Operações", "f": "LinkedIn", "e": "Triagem", "sv": "Declínio", "sg": "Finalizado", "t": "-", "c": "-", "fit": "", "vp": null, "vo": null, "md": "Contrato PJ", "mr": ""}, {"n": "Maria Reis", "v": "Analista de Planejamento", "a": "Operações", "f": "LinkedIn", "e": "Triagem", "sv": "Declínio", "sg": "Finalizado", "t": "-", "c": "-", "fit": "", "vp": null, "vo": null, "md": "Não tem interesse", "mr": ""}, {"n": "Gabriel Crispim", "v": "Analista de Planejamento", "a": "Operações", "f": "Indicação", "e": "Triagem", "sv": "Declínio", "sg": "Finalizado", "t": "-", "c": "-", "fit": "", "vp": 10000.0, "vo": 6000.0, "md": "Remuneração", "mr": ""}, {"n": "Rodrigo Silva", "v": "Analista de Planejamento", "a": "Operações", "f": "LinkedIn", "e": "Triagem", "sv": "Declínio", "sg": "Finalizado", "t": "-", "c": "-", "fit": "", "vp": 15000.0, "vo": 7000.0, "md": "Remuneração", "mr": ""}, {"n": "Aline Ferreira", "v": "Analista de Planejamento", "a": "Operações", "f": "LinkedIn", "e": "Triagem", "sv": "Declínio", "sg": "Finalizado", "t": "-", "c": "-", "fit": "", "vp": null, "vo": null, "md": "Candidato não responde", "mr": ""}, {"n": "Thiago Alessio R.", "v": "Analista de Planejamento", "a": "Operações", "f": "LinkedIn", "e": "Triagem", "sv": "Declínio", "sg": "Finalizado", "t": "-", "c": "-", "fit": "", "vp": 9000.0, "vo": 7000.0, "md": "Remuneração", "mr": ""}, {"n": "Vitor Silva", "v": "Analista de Planejamento", "a": "Operações", "f": "LinkedIn", "e": "Triagem", "sv": "Declínio", "sg": "Finalizado", "t": "-", "c": "-", "fit": "", "vp": null, "vo": null, "md": "Candidato não responde", "mr": ""}, {"n": "Leonardo Roza", "v": "Engenheiro de Dados SAS", "a": "Body Shop", "f": "LinkedIn", "e": "Triagem", "sv": "Declínio", "sg": "Finalizado", "t": "-", "c": "-", "fit": "", "vp": 18000.0, "vo": 16000.0, "md": "Remuneração", "mr": ""}, {"n": "Ricardo Rezende", "v": "Engenheiro de Dados SAS", "a": "Body Shop", "f": "LinkedIn", "e": "Triagem", "sv": "Declínio", "sg": "Finalizado", "t": "-", "c": "-", "fit": "", "vp": null, "vo": null, "md": "Não tem interesse", "mr": ""}, {"n": "Felippe Fraga", "v": "Engenheiro de Dados SAS", "a": "Body Shop", "f": "LinkedIn", "e": "Triagem", "sv": "Declínio", "sg": "Finalizado", "t": "-", "c": "-", "fit": "", "vp": 25000.0, "vo": 12500.0, "md": "Remuneração", "mr": ""}, {"n": "Cristiano Florentino", "v": "Engenheiro de Dados SAS", "a": "Body Shop", "f": "LinkedIn", "e": "Finalista / Entrevista com DIR", "sv": "Próxima etapa", "sg": "Congelado", "t": "5", "c": "5", "fit": "Alto", "vp": 17000.0, "vo": 16000.0, "md": "", "mr": ""}, {"n": "Rogério Souza", "v": "Engenheiro de Dados SAS", "a": "Body Shop", "f": "LinkedIn", "e": "Triagem", "sv": "Declínio", "sg": "Finalizado", "t": "-", "c": "-", "fit": "", "vp": null, "vo": null, "md": "Recebeu outra proposta", "mr": ""}, {"n": "Wagner Oliveira", "v": "Engenheiro de Dados SAS", "a": "Body Shop", "f": "LinkedIn", "e": "Triagem", "sv": "Declínio", "sg": "Finalizado", "t": "-", "c": "-", "fit": "", "vp": null, "vo": null, "md": "Não tem interesse", "mr": ""}, {"n": "Péricles Oliveira", "v": "Engenheiro de Dados SAS", "a": "Body Shop", "f": "LinkedIn", "e": "Triagem", "sv": "Declínio", "sg": "Finalizado", "t": "-", "c": "-", "fit": "", "vp": 22000.0, "vo": 12500.0, "md": "Remuneração", "mr": ""}, {"n": "Fernando Souza", "v": "Engenheiro de Dados SAS", "a": "Body Shop", "f": "LinkedIn", "e": "Triagem", "sv": "Declínio", "sg": "Finalizado", "t": "-", "c": "-", "fit": "", "vp": null, "vo": null, "md": "Não tem interesse", "mr": ""}, {"n": "Rafael Genovese", "v": "Engenheiro de Dados SAS", "a": "Body Shop", "f": "LinkedIn", "e": "Triagem", "sv": "Declínio", "sg": "Finalizado", "t": "-", "c": "-", "fit": "", "vp": 17000.0, "vo": 12500.0, "md": "Não tem interesse", "mr": ""}, {"n": "Mateus Seabra", "v": "Engenheiro de Dados SAS", "a": "Body Shop", "f": "LinkedIn", "e": "Triagem", "sv": "Declínio", "sg": "Finalizado", "t": "-", "c": "-", "fit": "", "vp": null, "vo": null, "md": "Recebeu outra proposta", "mr": ""}, {"n": "Ivan Lourenção", "v": "Engenheiro de Dados SAS", "a": "Body Shop", "f": "LinkedIn", "e": "Triagem", "sv": "Declínio", "sg": "Finalizado", "t": "-", "c": "-", "fit": "", "vp": 19000.0, "vo": 12500.0, "md": "Remuneração", "mr": ""}, {"n": "Ricardo Ozawa", "v": "Engenheiro de Dados SAS", "a": "Body Shop", "f": "LinkedIn", "e": "Entrevista com o RH", "sv": "Reprovado", "sg": "Finalizado", "t": "3", "c": "3", "fit": "Baixo", "vp": 10000.0, "vo": null, "md": "", "mr": "Conhecimento técnico insuficiente"}, {"n": "Tony Gomes", "v": "Engenheiro de Dados SAS", "a": "Body Shop", "f": "LinkedIn", "e": "Triagem", "sv": "Declínio", "sg": "Finalizado", "t": "-", "c": "-", "fit": "", "vp": null, "vo": null, "md": "Modelo Híbrido", "mr": ""}, {"n": "Magda Crosgnac", "v": "Engenheiro de Dados SAS", "a": "Body Shop", "f": "LinkedIn", "e": "Triagem", "sv": "Declínio", "sg": "Finalizado", "t": "-", "c": "-", "fit": "", "vp": null, "vo": null, "md": "Modelo Híbrido", "mr": ""}, {"n": "Paulo Chi", "v": "Desenvolvedor Full Stack", "a": "Operações", "f": "LinkedIn", "e": "Teste / Case", "sv": "Próxima etapa", "sg": "Congelado", "t": "4", "c": "5", "fit": "Médio", "vp": 12000.0, "vo": 10000.0, "md": "", "mr": ""}, {"n": "Jorge Luiz", "v": "Desenvolvedor Full Stack", "a": "Legal AI", "f": "LinkedIn", "e": "Teste / Case", "sv": "Próxima etapa", "sg": "Cancelado", "t": "5", "c": "4", "fit": "Alto", "vp": 10000.0, "vo": 10000.0, "md": "", "mr": ""}, {"n": "Allan Rodrigues", "v": "Desenvolvedor Full Stack", "a": "Legal AI", "f": "LinkedIn", "e": "Entrevista com o RH", "sv": "Próxima etapa", "sg": "Andamento", "t": "", "c": "", "fit": "", "vp": null, "vo": null, "md": "", "mr": ""}, {"n": "Patrick Almeida", "v": "Desenvolvedor Full Stack", "a": "Legal AI", "f": "LinkedIn", "e": "Entrevista Técnica", "sv": "Próxima etapa", "sg": "Andamento", "t": "4", "c": "5", "fit": "Médio", "vp": null, "vo": null, "md": "", "mr": ""}, {"n": "Ariane Geni", "v": "Analista de Projetos", "a": "Legal AI", "f": "LinkedIn", "e": "Entrevista Técnica", "sv": "Reprovado", "sg": "Finalizado", "t": "4", "c": "5", "fit": "Médio", "vp": 6000.0, "vo": 7000.0, "md": "", "mr": "Conhecimento técnico insuficiente"}, {"n": "Luana Monteiro", "v": "Analista de Projetos", "a": "Legal AI", "f": "LinkedIn", "e": "Entrevista Técnica", "sv": "Reprovado", "sg": "Finalizado", "t": "4", "c": "5", "fit": "Alto", "vp": 9000.0, "vo": 9000.0, "md": "", "mr": "Outra"}, {"n": "Náthali Gonçalves", "v": "Analista de Projetos", "a": "Legal AI", "f": "LinkedIn", "e": "Finalista / Entrevista com DIR", "sv": "Próxima etapa", "sg": "Andamento", "t": "5", "c": "5", "fit": "Alto", "vp": 9000.0, "vo": 9000.0, "md": "", "mr": ""}, {"n": "Fernando Noronha", "v": "Analista de Projetos", "a": "Legal AI", "f": "LinkedIn", "e": "Finalista / Entrevista com DIR", "sv": "Declínio", "sg": "Talent Hub", "t": "5", "c": "5", "fit": "Alto", "vp": 10500.0, "vo": 9000.0, "md": "", "mr": ""}, {"n": "João Victor", "v": "Analista de Projetos", "a": "Legal AI", "f": "LinkedIn", "e": "Entrevista com o RH", "sv": "Próxima etapa", "sg": "Stand By", "t": "4", "c": "5", "fit": "Médio", "vp": null, "vo": null, "md": "", "mr": "Outra"}, {"n": "Adriano Carvalhana", "v": "Analista de Projetos", "a": "Legal AI", "f": "LinkedIn", "e": "Entrevista com o RH", "sv": "Reprovado", "sg": "Stand By", "t": "4", "c": "5", "fit": "Médio", "vp": 9000.0, "vo": null, "md": "", "mr": "Outra"}, {"n": "Sara Ferreira", "v": "Analista de Projetos", "a": "Legal AI", "f": "LinkedIn", "e": "Triagem", "sv": "Declínio", "sg": "Finalizado", "t": "-", "c": "-", "fit": "", "vp": null, "vo": null, "md": "Contrato PJ", "mr": ""}, {"n": "Thaynara Rhafanely", "v": "Analista de Projetos", "a": "Legal AI", "f": "LinkedIn", "e": "Entrevista com o RH", "sv": "Reprovado", "sg": "Finalizado", "t": "2", "c": "2", "fit": "Baixo", "vp": null, "vo": null, "md": "", "mr": "Comportamento"}, {"n": "Viviane Arruda", "v": "Analista de Projetos", "a": "Legal AI", "f": "LinkedIn", "e": "Triagem", "sv": "Declínio", "sg": "Finalizado", "t": "-", "c": "-", "fit": "", "vp": null, "vo": null, "md": "Modelo Híbrido", "mr": ""}, {"n": "Francisco Trigueiro", "v": "Analista de Projetos", "a": "Legal AI", "f": "LinkedIn", "e": "Triagem", "sv": "Declínio", "sg": "Finalizado", "t": "-", "c": "-", "fit": "", "vp": null, "vo": null, "md": "Contrato PJ", "mr": ""}, {"n": "Laura Souza", "v": "Analista de Projetos", "a": "Legal AI", "f": "LinkedIn", "e": "Triagem", "sv": "Declínio", "sg": "Finalizado", "t": "-", "c": "-", "fit": "", "vp": 15000.0, "vo": 9000.0, "md": "Remuneração", "mr": ""}, {"n": "Caio Tavares", "v": "Analista de Projetos", "a": "Legal AI", "f": "LinkedIn", "e": "Triagem", "sv": "Declínio", "sg": "Finalizado", "t": "-", "c": "-", "fit": "", "vp": null, "vo": null, "md": "Modelo Híbrido", "mr": ""}, {"n": "Caique Moreira", "v": "Analista de Projetos", "a": "Legal AI", "f": "LinkedIn", "e": "Triagem", "sv": "Declínio", "sg": "Finalizado", "t": "-", "c": "-", "fit": "", "vp": null, "vo": null, "md": "Modelo Híbrido", "mr": ""}, {"n": "Viviane Marmo", "v": "Analista de Projetos", "a": "Legal AI", "f": "LinkedIn", "e": "Triagem", "sv": "Declínio", "sg": "Finalizado", "t": "-", "c": "-", "fit": "", "vp": null, "vo": null, "md": "Candidato não responde", "mr": ""}, {"n": "Priscilla Uehara", "v": "Analista de Projetos", "a": "Legal AI", "f": "LinkedIn", "e": "Triagem", "sv": "Próxima etapa", "sg": "Andamento", "t": "-", "c": "-", "fit": "", "vp": null, "vo": null, "md": "", "mr": ""}, {"n": "Janailton Sousa", "v": "Engenheiro de Áudio", "a": "Legal AI", "f": "LinkedIn", "e": "Triagem", "sv": "Declínio", "sg": "Finalizado", "t": "-", "c": "-", "fit": "", "vp": null, "vo": null, "md": "Não tem interesse", "mr": ""}, {"n": "Marco Gonzales", "v": "Engenheiro de Dados SAS", "a": "Body Shop", "f": "LinkedIn", "e": "Triagem", "sv": "Declínio", "sg": "Finalizado", "t": "-", "c": "-", "fit": "", "vp": null, "vo": null, "md": "Modelo Híbrido", "mr": ""}, {"n": "Fernanda Sanchez", "v": "Analista de Planejamento", "a": "Legal AI", "f": "LinkedIn", "e": "Triagem", "sv": "Próxima etapa", "sg": "Andamento", "t": "4", "c": "5", "fit": "Médio", "vp": null, "vo": null, "md": "", "mr": ""}]</script>
 <script>
-// ── THEME ──
+var CANDS = JSON.parse(document.getElementById('dados').textContent);
+
 function toggleTheme(){
   document.body.classList.toggle('light');
-  const isLight=document.body.classList.contains('light');
-  document.getElementById('tlbl').textContent=isLight?'Tema claro':'Tema escuro';
-  localStorage.setItem('theme',isLight?'light':'dark');
+  var L = document.body.classList.contains('light');
+  document.getElementById('tlbl').textContent = L ? 'Tema claro' : 'Tema escuro';
   rebuildCharts();
 }
-if(localStorage.getItem('theme')==='light'){
-  document.body.classList.add('light');
-  document.getElementById('tlbl').textContent='Tema claro';
-}
 
-// ── TABS ──
-function showPage(pid,tid){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+function showPage(pid, tid){
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('on')});
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on')});
   document.getElementById(pid).classList.add('on');
   document.getElementById(tid).classList.add('on');
-  document.getElementById(tid).scrollIntoView({inline:'nearest',block:'nearest'});
 }
 
-// ── DATA ──
-const CANDS=[
-  {n:'Vitor Brandão',v:'Eng. Dados',a:'Operações',f:'LinkedIn',e:'Finalista/DIR',sv:'Declínio',sg:'Finalizado',t:'5',c:'5',fit:'Alto'},
-  {n:'Marcos Nascimento',v:'Eng. Dados',a:'Operações',f:'LinkedIn',e:'Entrevista RH',sv:'Reprovado',sg:'Finalizado',t:'3',c:'4',fit:'Médio'},
-  {n:'Lucas Damasceno',v:'Eng. Dados',a:'Operações',f:'LinkedIn',e:'Entrevista RH',sv:'Declínio',sg:'Finalizado',t:'4',c:'5',fit:'Alto'},
-  {n:'Kelvin Willian',v:'Eng. Dados',a:'Operações',f:'LinkedIn',e:'Entrevista RH',sv:'Reprovado',sg:'Talent Hub',t:'5',c:'4',fit:'Alto'},
-  {n:'Marcos Lisboa',v:'Eng. Dados',a:'Operações',f:'LinkedIn',e:'Entrevista RH',sv:'Reprovado',sg:'Stand By',t:'3',c:'4',fit:'Baixo'},
-  {n:'Gianlucca A.',v:'Eng. Dados',a:'Operações',f:'LinkedIn',e:'Entrevista RH',sv:'Reprovado',sg:'Stand By',t:'3',c:'4',fit:'Médio'},
-  {n:'Dennis Sanches',v:'Eng. Dados',a:'Operações',f:'Indicação',e:'Triagem',sv:'Reprovado',sg:'Finalizado',t:'3',c:'-',fit:'Baixo'},
-  {n:'Nicolas Matos',v:'Eng. Dados',a:'Operações',f:'LinkedIn',e:'Triagem',sv:'Reprovado',sg:'Finalizado',t:'3',c:'4',fit:'Baixo'},
-  {n:'Maysa Kethelyn',v:'Closer',a:'Comercial',f:'LinkedIn',e:'Entrevista RH',sv:'Próxima etapa',sg:'Congelado',t:'3',c:'3',fit:'Alto'},
-  {n:'Guilherme Andrade',v:'Eng. Dados',a:'Operações',f:'LinkedIn',e:'Entrevista RH',sv:'Declínio',sg:'Stand By',t:'4',c:'4',fit:'Médio'},
-  {n:'Felipe Solera',v:'Eng. Dados',a:'Operações',f:'LinkedIn',e:'Proposta',sv:'Contratado',sg:'Finalizado',t:'4',c:'5',fit:'Alto'},
-  {n:'Felipe Santos',v:'Eng. Dados',a:'Operações',f:'LinkedIn',e:'Entrevista RH',sv:'Declínio',sg:'Finalizado',t:'3',c:'4',fit:'Baixo'},
-  {n:'Marcos Vinicius',v:'Eng. Dados',a:'Operações',f:'LinkedIn',e:'Entrevista RH',sv:'Declínio',sg:'Finalizado',t:'4',c:'5',fit:'Médio'},
-  {n:'Guilherme Mafra',v:'Eng. Dados',a:'Operações',f:'Catho',e:'Entrevista RH',sv:'Reprovado',sg:'Talent Hub',t:'4',c:'5',fit:'Alto'},
-  {n:'Hugo Saldanha',v:'Eng. Dados',a:'Operações',f:'LinkedIn',e:'Triagem',sv:'Reprovado',sg:'Stand By',t:'-',c:'-',fit:'Médio'},
-  {n:'Higor Lins',v:'Eng. Dados',a:'Operações',f:'Catho',e:'Triagem',sv:'Declínio',sg:'Talent Hub',t:'-',c:'-',fit:'Médio'},
-  {n:'Vinicius Machado',v:'Eng. Dados',a:'Operações',f:'LinkedIn',e:'Entrevista RH',sv:'Declínio',sg:'Talent Hub',t:'4',c:'4',fit:'Médio'},
-  {n:'Wesley Lima',v:'An. Planejamento',a:'Operações',f:'LinkedIn',e:'Entrevista RH',sv:'Próxima etapa',sg:'Andamento',t:'4',c:'5',fit:'Alto'},
-  {n:'Vinicius Gonçalves',v:'An. Planejamento',a:'Operações',f:'LinkedIn',e:'Entrevista RH',sv:'Reprovado',sg:'Finalizado',t:'3',c:'3',fit:'Baixo'},
-  {n:'Eduardo Bondezan',v:'An. Planejamento',a:'Operações',f:'LinkedIn',e:'Entrevista RH',sv:'Reprovado',sg:'Finalizado',t:'3',c:'3',fit:'Baixo'},
-  {n:'Jane Santos',v:'An. Planejamento',a:'Operações',f:'LinkedIn',e:'Entrevista RH',sv:'Declínio',sg:'Talent Hub',t:'4',c:'5',fit:'Alto'},
-  {n:'Michel Carvalho',v:'Dev. Full Stack',a:'Operações',f:'LinkedIn',e:'Triagem',sv:'Próxima etapa',sg:'Andamento',t:'4',c:'4',fit:'Médio'},
-  {n:'Thales Cirino',v:'Dev. Full Stack',a:'Operações',f:'LinkedIn',e:'Ent. Técnica',sv:'Próxima etapa',sg:'Andamento',t:'4',c:'5',fit:'Alto'},
-  {n:'Celso Ricardo',v:'Dev. Full Stack',a:'Operações',f:'Catho',e:'Entrevista RH',sv:'Reprovado',sg:'Finalizado',t:'3',c:'5',fit:'Baixo'},
-  {n:'William Silva',v:'Dev. Full Stack',a:'Operações',f:'LinkedIn',e:'Entrevista RH',sv:'Reprovado',sg:'Finalizado',t:'3',c:'4',fit:'Baixo'},
-  {n:'Danilo Moreira Salve',v:'Eng. IA',a:'Legal AI',f:'LinkedIn',e:'Finalista/DIR',sv:'Próxima etapa',sg:'Andamento',t:'-',c:'-',fit:'Alto'},
-  {n:'Ruan dos Santos',v:'Eng. IA',a:'Legal AI',f:'LinkedIn',e:'Finalista/DIR',sv:'Próxima etapa',sg:'Andamento',t:'-',c:'-',fit:'Médio'},
-  {n:'João Ricardo Pintaudi',v:'Eng. IA',a:'Legal AI',f:'LinkedIn',e:'Entrevista RH',sv:'Declínio',sg:'Finalizado',t:'5',c:'5',fit:'Alto'},
-  {n:'Klaus Bleinat',v:'Eng. IA',a:'Legal AI',f:'Indicação',e:'Entrevista RH',sv:'Reprovado',sg:'Finalizado',t:'3',c:'3',fit:'Baixo'},
-  {n:'Allan Medeiros',v:'Eng. IA',a:'Legal AI',f:'LinkedIn',e:'Finalista/DIR',sv:'Próxima etapa',sg:'Andamento',t:'-',c:'-',fit:'-'},
-  {n:'Pedro Tito',v:'Eng. Dados',a:'Operações',f:'LinkedIn',e:'Entrevista RH',sv:'Reprovado',sg:'Talent Hub',t:'5',c:'5',fit:'Alto'},
-  {n:'Milton Moura',v:'Eng. Dados',a:'Operações',f:'LinkedIn',e:'Entrevista RH',sv:'-',sg:'Finalizado',t:'4',c:'4',fit:'Alto'},
-  {n:'Gustavo Galvão',v:'Eng. Dados',a:'Operações',f:'LinkedIn',e:'Entrevista RH',sv:'Stand by',sg:'Finalizado',t:'5',c:'4',fit:'Médio'},
-  {n:'Gabriel Frigo',v:'Eng. Dados',a:'Operações',f:'LinkedIn',e:'Entrevista RH',sv:'Stand by',sg:'Finalizado',t:'5',c:'5',fit:'Alto'},
-  {n:'Christian Negrão',v:'Eng. Dados',a:'Operações',f:'LinkedIn',e:'Entrevista RH',sv:'Reprovado',sg:'Finalizado',t:'5',c:'5',fit:'Alto'},
-  {n:'Pedro Stoppa',v:'Eng. Dados',a:'Operações',f:'LinkedIn',e:'Entrevista RH',sv:'Reprovado',sg:'Finalizado',t:'4',c:'3',fit:'Baixo'},
-  {n:'Jessé Santana',v:'Dev. Full Stack',a:'Operações',f:'LinkedIn',e:'Teste/Case',sv:'Declínio',sg:'Finalizado',t:'5',c:'5',fit:'Alto'},
-  {n:'Paulo Chi',v:'Dev. Full Stack',a:'Operações',f:'LinkedIn',e:'Teste/Case',sv:'Próxima etapa',sg:'Andamento',t:'4',c:'5',fit:'Médio'},
-  {n:'Luiz Amaro',v:'Dev. Full Stack',a:'Legal AI',f:'LinkedIn',e:'Ent. Técnica',sv:'Próxima etapa',sg:'Andamento',t:'4',c:'4',fit:'Alto'},
-  {n:'Jorge Luiz',v:'Dev. Full Stack',a:'Legal AI',f:'LinkedIn',e:'Teste/Case',sv:'Próxima etapa',sg:'Andamento',t:'5',c:'4',fit:'Alto'},
-  {n:'Patrick Almeida',v:'Dev. Full Stack',a:'Legal AI',f:'LinkedIn',e:'Ent. Técnica',sv:'Próxima etapa',sg:'Andamento',t:'4',c:'5',fit:'Médio'},
-  {n:'Cristiano Florentino',v:'Eng. Dados SAS',a:'Body Shop',f:'LinkedIn',e:'Finalista/DIR',sv:'Próxima etapa',sg:'Andamento',t:'5',c:'5',fit:'Alto'},
-  {n:'Ricardo Ozawa',v:'Eng. Dados SAS',a:'Body Shop',f:'LinkedIn',e:'Entrevista RH',sv:'Reprovado',sg:'Finalizado',t:'3',c:'3',fit:'Baixo'},
-  {n:'Arnaldo Leandro',v:'Eng. Dados SAS',a:'Body Shop',f:'LinkedIn',e:'Entrevista RH',sv:'Declínio',sg:'Finalizado',t:'3',c:'4',fit:'Médio'},
-  {n:'Danielly Liz',v:'An. Planejamento',a:'Operações',f:'LinkedIn',e:'Entrevista RH',sv:'Reprovado',sg:'Stand By',t:'3',c:'5',fit:'Médio'},
-  {n:'Gustavo Lima',v:'Eng. Dados Backend',a:'Legal AI',f:'LinkedIn',e:'Entrevista RH',sv:'Declínio',sg:'Finalizado',t:'4',c:'4',fit:'Médio'},
-  {n:'David Paiva',v:'An. Planejamento',a:'Legal AI',f:'LinkedIn',e:'Triagem',sv:'Próxima etapa',sg:'Andamento',t:'-',c:'-',fit:'-'},
-  {n:'Eduardo Esteves',v:'Dev. Full Stack',a:'Legal AI',f:'LinkedIn',e:'Triagem',sv:'Próxima etapa',sg:'Andamento',t:'-',c:'-',fit:'-'},
-  {n:'Lucas Alexandre',v:'Eng. Dados Backend',a:'Legal AI',f:'LinkedIn',e:'Triagem',sv:'Próxima etapa',sg:'Andamento',t:'-',c:'-',fit:'-'},
-  {n:'Juliana Menezes',v:'Eng. Dados Backend',a:'Legal AI',f:'LinkedIn',e:'Triagem',sv:'Próxima etapa',sg:'Andamento',t:'-',c:'-',fit:'-'},
-  {n:'Daniel Mendes',v:'Eng. IA',a:'Legal AI',f:'LinkedIn',e:'Triagem',sv:'-',sg:'Andamento',t:'-',c:'-',fit:'-'},
-  {n:'João Pedro Tonello',v:'Eng. IA',a:'Legal AI',f:'LinkedIn',e:'Triagem',sv:'-',sg:'Andamento',t:'-',c:'-',fit:'-'},
-];
-
-function bA(a){if(!a||a==='-')return`<span style="color:var(--tx3)">—</span>`;if(a==='Operações')return`<span class="badge bo">${a}</span>`;if(a==='Legal AI')return`<span class="badge bl">${a}</span>`;if(a==='Body Shop')return`<span class="badge by">${a}</span>`;return`<span class="badge bp">${a}</span>`;}
-function bS(s){if(!s||s==='-')return`<span style="color:var(--tx3)">—</span>`;if(s==='Declínio')return`<span class="badge br">${s}</span>`;if(s==='Reprovado')return`<span class="badge by">${s}</span>`;if(s==='Contratado')return`<span class="badge bl">${s}</span>`;if(s==='Próxima etapa')return`<span class="badge bo">${s}</span>`;return`<span style="font-size:9px;color:var(--tx2)">${s}</span>`;}
-function bSc(v){if(!v||v==='-')return`<span style="color:var(--tx3)">—</span>`;const n=parseInt(v),c=n>=5?'#22c55e':n>=4?'#3b82f6':n===3?'#f59e0b':'#ef4444';return`<span style="font-weight:700;color:${c}">${v}</span>`;}
-function bFit(f){if(!f||f==='-')return`<span style="color:var(--tx3)">—</span>`;const c=f==='Alto'?'#22c55e':f==='Médio'?'#f59e0b':'#ef4444';return`<span style="font-weight:700;color:${c};font-size:9px">${f}</span>`;}
+function bA(a){
+  if(!a) return '<span style="color:var(--tx3)">—</span>';
+  var m = {'Operações':'bo','Legal AI':'bl','Body Shop':'by','Comercial':'bp','Tecnologia da Informação':'bg'};
+  return '<span class="badge '+(m[a]||'bp')+'">'+a+'</span>';
+}
+function bSv(s){
+  if(!s) return '<span style="color:var(--tx3)">—</span>';
+  var m = {'Declínio':'br','Reprovado':'by','Contratado':'bl','Próxima etapa':'bo'};
+  return '<span class="badge '+(m[s]||'bg')+'">'+s+'</span>';
+}
+function bSg(s){
+  if(!s) return '<span style="color:var(--tx3)">—</span>';
+  var m = {'Andamento':'bo','Finalizado':'bl','Stand By':'by','Talent Hub':'bp','Congelado':'bg','Cancelado':'br'};
+  return '<span class="badge '+(m[s]||'bg')+'">'+s+'</span>';
+}
+function bSc(v){
+  if(!v) return '<span style="color:var(--tx3)">—</span>';
+  var n=parseInt(v), c=n>=5?'#22c55e':n>=4?'#3b82f6':n===3?'#f59e0b':'#ef4444';
+  return '<span style="font-weight:700;color:'+c+'">'+v+'</span>';
+}
+function bFit(f){
+  if(!f) return '<span style="color:var(--tx3)">—</span>';
+  var c = f==='Alto'?'#22c55e':f==='Médio'?'#f59e0b':'#ef4444';
+  return '<span style="font-weight:700;color:'+c+';font-size:9px">'+f+'</span>';
+}
 
 function renderTabela(data){
-  document.getElementById('tbody').innerHTML=data.map(d=>`<tr>
-    <td style="font-weight:600;color:var(--kv)">${d.n}</td>
-    <td style="font-size:9px">${d.v}</td>
-    <td>${bA(d.a)}</td>
-    <td style="font-size:9px">${d.f}</td>
-    <td style="font-size:9px;color:var(--tx3)">${d.e||'—'}</td>
-    <td>${bS(d.sv)}</td>
-    <td style="font-size:9px;color:var(--tx3)">${d.sg||'—'}</td>
-    <td>${bSc(d.t)}</td><td>${bSc(d.c)}</td><td>${bFit(d.fit)}</td>
-  </tr>`).join('');
-  document.getElementById('fcnt').textContent=`${data.length} registros`;
+  document.getElementById('tbody').innerHTML = data.map(function(d){
+    return '<tr><td style="font-weight:600;color:var(--kv)">'+(d.n||'—')+'</td><td style="font-size:9px">'+(d.v||'—')+'</td><td>'+bA(d.a)+'</td><td style="font-size:9px">'+(d.f||'—')+'</td><td style="font-size:9px;color:var(--tx3)">'+(d.e||'—')+'</td><td>'+bSv(d.sv)+'</td><td>'+bSg(d.sg)+'</td><td>'+bSc(d.t)+'</td><td>'+bSc(d.c)+'</td><td>'+bFit(d.fit)+'</td></tr>';
+  }).join('');
+  document.getElementById('fcnt').textContent = data.length + ' registros';
 }
+
 function filtrar(){
-  const q=document.getElementById('fsrch').value.toLowerCase();
-  const fa=document.getElementById('farea').value;
-  const fs=document.getElementById('fstat').value;
-  renderTabela(CANDS.filter(d=>{
-    const m=!q||(d.n+d.v+d.e+d.sv+d.sg).toLowerCase().includes(q);
-    return m&&(!fa||d.a===fa)&&(!fs||d.sg===fs);
+  var q = document.getElementById('fsrch').value.toLowerCase();
+  var fa = document.getElementById('farea').value;
+  var fs = document.getElementById('fstat').value;
+  renderTabela(CANDS.filter(function(d){
+    var m = !q || ((d.n||'')+(d.v||'')+(d.e||'')+(d.sv||'')+(d.sg||'')).toLowerCase().indexOf(q) >= 0;
+    return m && (!fa || d.a===fa) && (!fs || d.sg===fs);
   }));
 }
 renderTabela(CANDS);
 
-// ── CHARTS ──
-let CHS=[];
+var CHS = [];
 function getT(){
-  const L=document.body.classList.contains('light');
-  return{g:L?'rgba(0,0,0,0.05)':'rgba(255,255,255,0.05)',t:L?'#8a9cc0':'#4e6a9a'};
+  var L = document.body.classList.contains('light');
+  return {g: L?'rgba(0,0,0,0.05)':'rgba(255,255,255,0.05)', t: L?'#8a9cc0':'#4e6a9a'};
 }
-function destroyCharts(){CHS.forEach(c=>c.destroy());CHS=[];}
-function buildCharts(){
-  const{g,t}=getT();
-  const tk={color:t,font:{size:10}};
-  const B={responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}};
-  const add=c=>CHS.push(c);
+function destroyCharts(){CHS.forEach(function(c){c.destroy()}); CHS=[];}
 
-  add(new Chart('cFonte',{type:'doughnut',data:{datasets:[{data:[96,3,3],backgroundColor:['#3b82f6','#22c55e','#f59e0b'],borderWidth:0}]},options:{...B,cutout:'68%'}}));
-  add(new Chart('cStatus',{type:'doughnut',data:{datasets:[{data:[68,19,6,6,1],backgroundColor:['#4b6a9a','#22c55e','#f59e0b','#60a5fa','#a855f7'],borderWidth:0}]},options:{...B,cutout:'68%'}}));
-  add(new Chart('cArea',{type:'doughnut',data:{datasets:[{data:[55,29,16,1,1],backgroundColor:['#3b82f6','#22c55e','#f59e0b','#ef4444','#a855f7'],borderWidth:0}]},options:{...B,cutout:'65%'}}));
-  add(new Chart('cStatusV',{type:'bar',data:{labels:['Declínio','Reprovado','Próx.etapa','Stand by','Contratado'],datasets:[{data:[56,18,17,2,1],backgroundColor:['#ef4444','#f59e0b','#22c55e','#60a5fa','#22c55e'],borderRadius:5}]},options:{...B,scales:{x:{ticks:tk,grid:{color:g}},y:{ticks:tk,grid:{color:g}}}}}));
-  add(new Chart('cFunil',{type:'bar',data:{labels:['Triagem','Entrev.RH','Ent.Técnica','Case','Finalista','Proposta','Contratado'],datasets:[{data:[59,30,4,3,5,1,1],backgroundColor:['#3b82f6','#60a5fa','#22c55e','#f59e0b','#a855f7','#f59e0b','#22c55e'],borderRadius:5}]},options:{...B,scales:{x:{ticks:{color:t,font:{size:9},maxRotation:25},grid:{color:g}},y:{ticks:tk,grid:{color:g}}}}}));
-  add(new Chart('cAreaEst',{type:'bar',data:{labels:['Triagem','RH','Técnica','Finalista'],datasets:[{label:'Operações',data:[30,16,2,3],backgroundColor:'#3b82f6',borderRadius:3},{label:'Legal AI',data:[18,9,1,2],backgroundColor:'#22c55e',borderRadius:3},{label:'Body Shop',data:[11,5,1,0],backgroundColor:'#f59e0b',borderRadius:3}]},options:{...B,scales:{x:{ticks:{color:t,font:{size:9}},grid:{color:g},stacked:true},y:{ticks:tk,grid:{color:g},stacked:true}},plugins:{legend:{display:true,labels:{color:t,font:{size:9},boxWidth:7}}}}}));
-  add(new Chart('cStatusPie',{type:'doughnut',data:{datasets:[{data:[19,68,6,6,1],backgroundColor:['#22c55e','#4b6a9a','#f59e0b','#60a5fa','#a855f7'],borderWidth:0}]},options:{...B,cutout:'60%'}}));
-  add(new Chart('cTec',{type:'bar',data:{labels:['Score 3','Score 4','Score 5'],datasets:[{data:[15,16,10],backgroundColor:['#f59e0b','#3b82f6','#22c55e'],borderRadius:6}]},options:{...B,scales:{x:{ticks:tk,grid:{color:g}},y:{ticks:tk,grid:{color:g}}}}}));
-  add(new Chart('cComp',{type:'bar',data:{labels:['Score 3','Score 4','Score 5'],datasets:[{data:[6,17,18],backgroundColor:['#f59e0b','#3b82f6','#22c55e'],borderRadius:6}]},options:{...B,scales:{x:{ticks:tk,grid:{color:g}},y:{ticks:tk,grid:{color:g}}}}}));
-  add(new Chart('cFit',{type:'doughnut',data:{datasets:[{data:[19,17,11],backgroundColor:['#22c55e','#f59e0b','#ef4444'],borderWidth:0}]},options:{...B,cutout:'62%'}}));
-  add(new Chart('cScatter',{type:'scatter',data:{datasets:[{data:[{x:5,y:5},{x:3,y:4},{x:4,y:5},{x:5,y:4},{x:3,y:4},{x:3,y:4},{x:3,y:4},{x:4,y:4},{x:4,y:5},{x:3,y:4},{x:4,y:5},{x:3,y:4},{x:4,y:5},{x:4,y:5},{x:4,y:4},{x:4,y:5},{x:3,y:3},{x:3,y:3},{x:4,y:5},{x:4,y:4},{x:4,y:5},{x:3,y:5},{x:3,y:4},{x:5,y:5},{x:3,y:4},{x:5,y:4},{x:4,y:5},{x:3,y:4},{x:3,y:5},{x:5,y:5},{x:4,y:4},{x:4,y:5},{x:5,y:5},{x:3,y:4},{x:4,y:4},{x:5,y:5},{x:4,y:4},{x:3,y:4},{x:4,y:5},{x:5,y:5},{x:4,y:3}],backgroundColor:'rgba(59,130,246,0.5)',pointRadius:5}]},options:{...B,scales:{x:{min:2,max:6,ticks:{...tk,stepSize:1},grid:{color:g},title:{display:true,text:'Score Técnico',color:t,font:{size:9}}},y:{min:2,max:6,ticks:{...tk,stepSize:1},grid:{color:g},title:{display:true,text:'Score Comp.',color:t,font:{size:9}}}}}}));
-  add(new Chart('cFitTec',{type:'bar',data:{labels:['Score 3','Score 4','Score 5'],datasets:[{label:'Alto',data:[4,8,7],backgroundColor:'#22c55e',borderRadius:3},{label:'Médio',data:[7,6,2],backgroundColor:'#f59e0b',borderRadius:3},{label:'Baixo',data:[4,4,1],backgroundColor:'#ef4444',borderRadius:3}]},options:{...B,scales:{x:{ticks:tk,grid:{color:g}},y:{ticks:tk,grid:{color:g}}},plugins:{legend:{display:true,labels:{color:t,font:{size:9},boxWidth:7}}}}}));
-  add(new Chart('cDecl',{type:'bar',data:{labels:['Remuneração','Modelo Híbrido','Não tem interesse','Contrato PJ','Não responde','Outra proposta','Distância','Outros'],datasets:[{data:[20,8,8,5,3,3,3,2],backgroundColor:['#ef4444','#f87171','#f87171','#f59e0b','#f59e0b','#f59e0b','#94a3b8','#64748b'],borderRadius:4}]},options:{...B,indexAxis:'y',scales:{x:{ticks:tk,grid:{color:g}},y:{ticks:{color:t,font:{size:9}},grid:{color:g}}}}}));
-  add(new Chart('cReprov',{type:'bar',data:{labels:['Tec. insuficiente','Overqualification','Outra','Comportamento'],datasets:[{data:[11,6,2,1],backgroundColor:['#ef4444','#f59e0b','#94a3b8','#60a5fa'],borderRadius:5}]},options:{...B,scales:{x:{ticks:tk,grid:{color:g}},y:{ticks:tk,grid:{color:g}}}}}));
-  const sN=['V.Brandão','M.Nascimento','Kelvin','Higor','V.Machado','Wesley','V.Gonçalves','E.Bondezan','Jane S.','G.Mafra','Thales','William','Milton','G.Galvão','G.Frigo','C.Negrão','J.R.Pintaudi','G.Lima','G.Crispim','R.Silva','T.Alessio','F.Fraga','C.Florentino','P.Oliveira','Ivan L.','R.Genovese','Jorge L.','Paulo Chi'];
-  const sP=[null,7000,18000,12000,15000,5000,3500,3500,11000,10000,9500,4000,null,13000,15000,19000,17000,16500,10000,15000,9000,25000,17000,22000,17000,17000,10000,12000];
-  const sO=[8000,null,null,8000,8000,6000,6000,8000,6000,8000,1000,10000,null,8000,8000,8000,15000,10000,6000,7000,7000,12500,16000,12500,12500,12500,10000,10000];
-  add(new Chart('cSalComp',{type:'bar',data:{labels:sN,datasets:[{label:'Pretendido',data:sP,backgroundColor:'rgba(245,158,11,.75)',borderRadius:3},{label:'Ofertado',data:sO,backgroundColor:'rgba(59,130,246,.75)',borderRadius:3}]},options:{...B,scales:{x:{ticks:{color:t,font:{size:8},display:false},grid:{color:g}},y:{ticks:{color:t,font:{size:9},callback:v=>v?'R$'+Math.round(v/1000)+'k':''},grid:{color:g}}},plugins:{legend:{display:true,labels:{color:t,font:{size:9},boxWidth:8}}}}}));
-  add(new Chart('cSalDist',{type:'bar',data:{labels:['Até R$8k','R$8-12k','R$12-18k','Acima R$18k'],datasets:[{data:[3,4,5,2],backgroundColor:['#22c55e','#3b82f6','#f59e0b','#ef4444'],borderRadius:5}]},options:{...B,scales:{x:{ticks:tk,grid:{color:g}},y:{ticks:tk,grid:{color:g}}}}}));
-  add(new Chart('cAreaBar',{type:'bar',data:{labels:['Operações','Legal AI','Body Shop','Comercial','TI'],datasets:[{data:[55,29,16,1,1],backgroundColor:['#3b82f6','#22c55e','#f59e0b','#ef4444','#a855f7'],borderRadius:5}]},options:{...B,scales:{x:{ticks:tk,grid:{color:g}},y:{ticks:tk,grid:{color:g}}}}}));
-  add(new Chart('cVagaSt',{type:'bar',data:{labels:['Declínio','Reprovado','Próx.etapa','Stand by','Contratado'],datasets:[{data:[56,18,17,2,1],backgroundColor:['#ef4444','#f59e0b','#22c55e','#60a5fa','#22c55e'],borderRadius:5}]},options:{...B,scales:{x:{ticks:tk,grid:{color:g}},y:{ticks:tk,grid:{color:g}}}}}));
+function buildCharts(){
+  var T=getT(), g=T.g, t=T.t;
+  var tk = {color:t, font:{size:10}};
+  var tot = CANDS.length;
+
+  // Aggregations
+  var byArea={}, byVaga={}, bySg={}, bySv={}, byFonte={};
+  CANDS.forEach(function(d){
+    if(d.a) byArea[d.a] = (byArea[d.a]||0)+1;
+    if(d.v) byVaga[d.v] = (byVaga[d.v]||0)+1;
+    if(d.sg) bySg[d.sg] = (bySg[d.sg]||0)+1;
+    if(d.sv) bySv[d.sv] = (bySv[d.sv]||0)+1;
+    if(d.f) byFonte[d.f] = (byFonte[d.f]||0)+1;
+  });
+
+  // KPIs
+  document.getElementById('kTot').textContent = tot;
+  document.getElementById('kAnd').textContent = bySg['Andamento']||0;
+  document.getElementById('kFin').textContent = bySg['Finalizado']||0;
+  document.getElementById('kHub').textContent = (bySg['Stand By']||0)+(bySg['Talent Hub']||0);
+  document.getElementById('kCon').textContent = bySv['Contratado']||0;
+  document.getElementById('kVag').textContent = Object.keys(byVaga).length;
+
+  // Barras horizontais vagas
+  var vagaE = Object.entries(byVaga).sort(function(a,b){return b[1]-a[1]});
+  var maxV = vagaE[0] ? vagaE[0][1] : 1;
+  document.getElementById('hVaga').innerHTML = vagaE.map(function(e){
+    return '<div class="hbar-row"><span class="hbar-lbl">'+e[0]+'</span><div class="hbar-track"><div class="hbar-fill" style="width:'+Math.round(e[1]/maxV*100)+'%;background:#3b82f6"></div></div><span class="hbar-val">'+e[1]+'</span></div>';
+  }).join('');
+
+  var COLORS = ['#3b82f6','#22c55e','#f59e0b','#ef4444','#a855f7','#06b6d4','#84cc16'];
+
+  // Fontes
+  CHS.push(new Chart('cFonte',{type:'doughnut',data:{datasets:[{data:Object.values(byFonte),backgroundColor:COLORS,borderWidth:0}],labels:Object.keys(byFonte)},options:{responsive:true,maintainAspectRatio:false,cutout:'68%',plugins:{legend:{display:true,labels:{color:t,font:{size:9},boxWidth:7}}}}}));
+
+  // Status geral
+  CHS.push(new Chart('cStatus',{type:'doughnut',data:{datasets:[{data:Object.values(bySg),backgroundColor:COLORS,borderWidth:0}],labels:Object.keys(bySg)},options:{responsive:true,maintainAspectRatio:false,cutout:'68%',plugins:{legend:{display:true,labels:{color:t,font:{size:9},boxWidth:7}}}}}));
+
+  // Área
+  CHS.push(new Chart('cArea',{type:'doughnut',data:{datasets:[{data:Object.values(byArea),backgroundColor:COLORS,borderWidth:0}],labels:Object.keys(byArea)},options:{responsive:true,maintainAspectRatio:false,cutout:'65%',plugins:{legend:{display:true,labels:{color:t,font:{size:9},boxWidth:7}}}}}));
+
+  // Status vaga bar
+  CHS.push(new Chart('cStatusV',{type:'bar',data:{labels:Object.keys(bySv),datasets:[{data:Object.values(bySv),backgroundColor:COLORS,borderRadius:5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:tk,grid:{color:g}},y:{ticks:tk,grid:{color:g}}}}}));
+
+  // FUNIL - usando estágios reais dos dados
+  var estagiosOrdem = ['Triagem','Entrevista com o RH','Entrevista Técnica','Teste / Case','Finalista / Entrevista com DIR','Proposta','Contratado'];
+  var funilEl = document.getElementById('funil');
+  funilEl.innerHTML = '';
+  var fColors = ['#3b82f6','#6366f1','#8b5cf6','#a855f7','#ec4899','#f43f5e','#22c55e'];
+  var totalFunil = CANDS.length;
+  estagiosOrdem.forEach(function(e, i){
+    var n = CANDS.filter(function(d){return d.e===e}).length;
+    if(n === 0) return;
+    var pct = Math.round(n/totalFunil*100);
+    var w = Math.max(35, pct + 35);
+    funilEl.innerHTML += '<div class="fstep" style="width:'+Math.min(100,w)+'%;background:'+fColors[i]+'22;border:1px solid '+fColors[i]+'55"><span style="color:'+fColors[i]+';font-weight:600">'+e+'</span><span><strong style="color:var(--kv)">'+n+'</strong><span class="fstep-pct"> ('+pct+'%)</span></span></div><div class="farrow"></div>';
+  });
+
+  // Área x Estágio
+  var areasK = Object.keys(byArea);
+  CHS.push(new Chart('cAreaEst',{type:'bar',data:{labels:estagiosOrdem,datasets:areasK.map(function(area,i){return{label:area,data:estagiosOrdem.map(function(e){return CANDS.filter(function(d){return d.a===area&&d.e===e}).length}),backgroundColor:COLORS[i]||'#94a3b8',borderRadius:3};})},options:{responsive:true,maintainAspectRatio:false,scales:{x:{ticks:{color:t,font:{size:9}},grid:{color:g},stacked:true},y:{ticks:tk,grid:{color:g},stacked:true}},plugins:{legend:{display:true,labels:{color:t,font:{size:9},boxWidth:7}}}}}));
+
+  // Scores
+  var tecs = CANDS.filter(function(d){return d.t&&d.t!==''}).map(function(d){return parseInt(d.t)}).filter(function(n){return !isNaN(n)});
+  var comps = CANDS.filter(function(d){return d.c&&d.c!==''}).map(function(d){return parseInt(d.c)}).filter(function(n){return !isNaN(n)});
+  var fits = {};
+  CANDS.forEach(function(d){if(d.fit&&d.fit!=='') fits[d.fit]=(fits[d.fit]||0)+1;});
+
+  document.getElementById('kStec').textContent = tecs.length ? (tecs.reduce(function(a,b){return a+b},0)/tecs.length).toFixed(1) : '—';
+  document.getElementById('kScom').textContent = comps.length ? (comps.reduce(function(a,b){return a+b},0)/comps.length).toFixed(1) : '—';
+  document.getElementById('kFalt').textContent = fits['Alto']||0;
+  document.getElementById('kFmed').textContent = fits['Médio']||0;
+  document.getElementById('kFbai').textContent = fits['Baixo']||0;
+
+  var scoreLabels = ['1','2','3','4','5'];
+  CHS.push(new Chart('cTec',{type:'bar',data:{labels:scoreLabels,datasets:[{data:scoreLabels.map(function(n){return tecs.filter(function(v){return v===parseInt(n)}).length}),backgroundColor:['#ef4444','#f59e0b','#f59e0b','#3b82f6','#22c55e'],borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:tk,grid:{color:g}},y:{ticks:tk,grid:{color:g}}}}}));
+  CHS.push(new Chart('cComp',{type:'bar',data:{labels:scoreLabels,datasets:[{data:scoreLabels.map(function(n){return comps.filter(function(v){return v===parseInt(n)}).length}),backgroundColor:['#ef4444','#f59e0b','#f59e0b','#3b82f6','#22c55e'],borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:tk,grid:{color:g}},y:{ticks:tk,grid:{color:g}}}}}));
+  CHS.push(new Chart('cFit',{type:'doughnut',data:{datasets:[{data:[fits['Alto']||0,fits['Médio']||0,fits['Baixo']||0],backgroundColor:['#22c55e','#f59e0b','#ef4444'],borderWidth:0}],labels:['Alto','Médio','Baixo']},options:{responsive:true,maintainAspectRatio:false,cutout:'62%',plugins:{legend:{display:true,labels:{color:t,font:{size:9},boxWidth:7}}}}}));
+
+  // Scatter
+  var scatterData = CANDS.filter(function(d){return d.t&&d.c&&d.t!==''&&d.c!==''}).map(function(d){return{x:parseInt(d.t),y:parseInt(d.c)}});
+  CHS.push(new Chart('cScatter',{type:'scatter',data:{datasets:[{data:scatterData,backgroundColor:'rgba(59,130,246,0.5)',pointRadius:5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{min:0,max:6,ticks:Object.assign({},tk,{stepSize:1}),grid:{color:g},title:{display:true,text:'Score Técnico',color:t,font:{size:9}}},y:{min:0,max:6,ticks:Object.assign({},tk,{stepSize:1}),grid:{color:g},title:{display:true,text:'Score Comportamental',color:t,font:{size:9}}}}}}));
+
+  // Fit x Tec
+  var ftData = ['Alto','Médio','Baixo'].map(function(fit){return scoreLabels.map(function(sc){return CANDS.filter(function(d){return d.fit===fit&&parseInt(d.t)===parseInt(sc)}).length})});
+  CHS.push(new Chart('cFitTec',{type:'bar',data:{labels:scoreLabels,datasets:[{label:'Alto',data:ftData[0],backgroundColor:'#22c55e',borderRadius:3},{label:'Médio',data:ftData[1],backgroundColor:'#f59e0b',borderRadius:3},{label:'Baixo',data:ftData[2],backgroundColor:'#ef4444',borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{ticks:tk,grid:{color:g}},y:{ticks:tk,grid:{color:g}}},plugins:{legend:{display:true,labels:{color:t,font:{size:9},boxWidth:7}}}}}));
+
+  // Declínios
+  var declM={}, repM={};
+  CANDS.forEach(function(d){
+    if(d.sv==='Declínio'&&d.md) declM[d.md]=(declM[d.md]||0)+1;
+    if(d.sv==='Reprovado'&&d.mr) repM[d.mr]=(repM[d.mr]||0)+1;
+  });
+  document.getElementById('kDecl').textContent = bySv['Declínio']||0;
+  document.getElementById('kRep').textContent = bySv['Reprovado']||0;
+  var tecRep = Object.entries(repM).filter(function(e){return e[0].toLowerCase().indexOf('técn')>=0||e[0].toLowerCase().indexOf('tecn')>=0}).reduce(function(a,e){return a+e[1]},0);
+  document.getElementById('kTecR').textContent = tecRep||0;
+  var remN = Object.entries(declM).filter(function(e){return e[0].toLowerCase().indexOf('remun')>=0||e[0].toLowerCase().indexOf('salár')>=0||e[0].toLowerCase().indexOf('valor')>=0||e[0].toLowerCase().indexOf('remuner')>=0}).reduce(function(a,e){return a+e[1]},0);
+  document.getElementById('kRem').textContent = remN||0;
+
+  if(Object.keys(declM).length>0){
+    CHS.push(new Chart('cDecl',{type:'bar',data:{labels:Object.keys(declM),datasets:[{data:Object.values(declM),backgroundColor:'#ef4444',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{ticks:tk,grid:{color:g}},y:{ticks:{color:t,font:{size:9}},grid:{color:g}}}}}));
+  }
+  if(Object.keys(repM).length>0){
+    CHS.push(new Chart('cReprov',{type:'bar',data:{labels:Object.keys(repM),datasets:[{data:Object.values(repM),backgroundColor:['#ef4444','#f59e0b','#94a3b8','#60a5fa','#a855f7'],borderRadius:5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:tk,grid:{color:g}},y:{ticks:tk,grid:{color:g}}}}}));
+  }
+
+  // Salários - só faixas
+  var pretArr = CANDS.filter(function(d){return d.vp&&d.vp>0}).map(function(d){return d.vp});
+  var oferArr = CANDS.filter(function(d){return d.vo&&d.vo>0}).map(function(d){return d.vo});
+  var avgPret = pretArr.length ? pretArr.reduce(function(a,b){return a+b},0)/pretArr.length : 0;
+  var avgOfer = oferArr.length ? oferArr.reduce(function(a,b){return a+b},0)/oferArr.length : 0;
+  document.getElementById('kMpret').textContent = avgPret ? 'R$'+Math.round(avgPret).toLocaleString('pt-BR') : '—';
+  document.getElementById('kMofer').textContent = avgOfer ? 'R$'+Math.round(avgOfer).toLocaleString('pt-BR') : '—';
+  document.getElementById('kGap').textContent = (avgPret&&avgOfer) ? 'R$'+Math.round(avgPret-avgOfer).toLocaleString('pt-BR') : '—';
+
+  var salF=[0,0,0,0,0];
+  pretArr.forEach(function(v){
+    if(v<=5000) salF[0]++;
+    else if(v<=8000) salF[1]++;
+    else if(v<=12000) salF[2]++;
+    else if(v<=18000) salF[3]++;
+    else salF[4]++;
+  });
+  CHS.push(new Chart('cSalDist',{type:'bar',data:{labels:['Até R$5k','R$5-8k','R$8-12k','R$12-18k','Acima R$18k'],datasets:[{data:salF,backgroundColor:['#22c55e','#3b82f6','#f59e0b','#ef4444','#a855f7'],borderRadius:5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:tk,grid:{color:g}},y:{ticks:tk,grid:{color:g}}}}}));
 }
+
 function rebuildCharts(){destroyCharts();buildCharts();}
 buildCharts();
 </script>
